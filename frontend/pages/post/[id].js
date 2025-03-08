@@ -1,7 +1,28 @@
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 
 export default function BlogPost({ blog: initialBlog }) {
-  if (!initialBlog) {
+  const [blog, setBlog] = useState(initialBlog);
+  const router = useRouter();
+  const { id } = router.query;
+
+  useEffect(() => {
+    if (id) {
+      const fetchLatestBlog = async () => {
+        try {
+          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${id}`);
+          setBlog(res.data);
+        } catch (err) {
+          console.error('Failed to fetch latest blog:', err.response?.data || err.message);
+        }
+      };
+      fetchLatestBlog();
+    }
+  }, [id]);
+
+  if (!blog) {
     return (
       <div className="container mx-auto p-4">
         <p>Loading or Blog Not Found...</p>
@@ -11,17 +32,18 @@ export default function BlogPost({ blog: initialBlog }) {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">{initialBlog.title}</h1>
-      <div className="prose">{initialBlog.content}</div>
+      <h1 className="text-2xl font-bold mb-4">{blog.title}</h1>
+      <div className="prose">
+        <ReactMarkdown>{blog.content}</ReactMarkdown>
+      </div>
     </div>
   );
 }
 
 export async function getStaticPaths() {
-  // In development, avoid prerendering all paths to prevent build errors if backend is down
   return {
-    paths: [], // No specific paths prerendered at build time
-    fallback: 'blocking', // Generate pages on-demand at runtime
+    paths: [],
+    fallback: 'blocking',
   };
 }
 
@@ -32,13 +54,11 @@ export async function getStaticProps({ params }) {
       return { notFound: true };
     }
     return {
-      props: {
-        blog: res.data, // Pass blog data (title, content, etc.) to the page
-      },
-      revalidate: 10, // Optional: Incremental Static Regeneration every 10 seconds
+      props: { blog: res.data },
+      revalidate: 10, // Still useful for background updates
     };
   } catch (err) {
-    console.error('Failed to fetch blog:', err.message);
-    return { notFound: true }; // Return 404 if the blog isn’t found or API fails
+    console.error('Failed to fetch blog:', err.response?.data || err.message);
+    return { notFound: true };
   }
 }

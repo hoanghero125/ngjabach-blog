@@ -7,34 +7,28 @@ export default function Admin() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [editId, setEditId] = useState(null);
-  const [token, setToken] = useState(null); // Move token to state
+  const [token, setToken] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
-    // Set token on client-side only
     const storedToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     setToken(storedToken);
-
     if (!storedToken) {
       router.push('/login');
     } else {
       fetchBlogs(storedToken);
     }
-  }, [router]); // Depend only on router, token is now state
+  }, [router]);
 
   const fetchBlogs = async (authToken) => {
     try {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blogs`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
+      console.log('Fetched blogs:', res.data);
       setBlogs(res.data);
     } catch (err) {
-      console.error('Failed to fetch blogs:', err);
-      if (err.response?.status === 401) {
-        localStorage.removeItem('token');
-        setToken(null);
-        router.push('/login');
-      }
+      console.error('Failed to fetch blogs:', err.response?.data || err.message);
     }
   };
 
@@ -43,20 +37,23 @@ export default function Admin() {
     const config = { headers: { Authorization: `Bearer ${token}` } };
     try {
       if (editId) {
-        await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${editId}`, { title, content }, config);
+        const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${editId}`, { title, content }, config);
+        console.log('Edit response:', res.data);
         setEditId(null);
       } else {
-        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/blogs`, { title, content }, config);
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/blogs`, { title, content }, config);
+        console.log('Create response:', res.data);
       }
       setTitle('');
       setContent('');
       fetchBlogs(token);
     } catch (err) {
-      console.error('Failed to save blog:', err);
+      console.error('Failed to save blog:', err.response?.data || err.message);
     }
   };
 
   const handleEdit = (blog) => {
+    console.log('Editing blog:', blog);
     setEditId(blog._id);
     setTitle(blog.title);
     setContent(blog.content);
@@ -65,10 +62,10 @@ export default function Admin() {
   const handleDelete = async (id) => {
     console.log('Delete clicked for ID:', id);
     try {
-      const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${id}`, {
+      const res = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log('Delete response:', response.data);
+      console.log('Delete response:', res.data);
       fetchBlogs(token);
     } catch (err) {
       console.error('Failed to delete blog:', err.response?.data || err.message);

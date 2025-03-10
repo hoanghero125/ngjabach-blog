@@ -1,4 +1,5 @@
 import '../styles/globals.css';
+import '../styles/custom.css'; // Thêm dòng này
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 

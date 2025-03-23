@@ -1,1 +1,17 @@
-@import "tailwindcss";
+@import url('./custom.css');
+@import 'tailwindcss';
+
+@keyframes fadeOutDown {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+.fade-out-down {
+  animation: fadeOutDown 0.5s ease-in-out forwards;
+}

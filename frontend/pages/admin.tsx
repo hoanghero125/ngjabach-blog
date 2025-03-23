@@ -2,12 +2,19 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 
+interface Blog {
+  _id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+}
+
 export default function Admin() {
-  const [blogs, setBlogs] = useState([]);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [editId, setEditId] = useState(null);
-  const [token, setToken] = useState(null);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [title, setTitle] = useState<string>('');
+  const [content, setContent] = useState<string>('');
+  const [editId, setEditId] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,19 +27,19 @@ export default function Admin() {
     }
   }, [router]);
 
-  const fetchBlogs = async (authToken) => {
+  const fetchBlogs = async (authToken: string) => {
     try {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blogs`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       console.log('Fetched blogs:', res.data);
       setBlogs(res.data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch blogs:', err.response?.data || err.message);
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const config = { headers: { Authorization: `Bearer ${token}` } };
     try {
@@ -46,28 +53,28 @@ export default function Admin() {
       }
       setTitle('');
       setContent('');
-      fetchBlogs(token);
-    } catch (err) {
+      fetchBlogs(token!);
+    } catch (err: any) {
       console.error('Failed to save blog:', err.response?.data || err.message);
     }
   };
 
-  const handleEdit = (blog) => {
+  const handleEdit = (blog: Blog) => {
     console.log('Editing blog:', blog);
     setEditId(blog._id);
     setTitle(blog.title);
     setContent(blog.content);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     console.log('Delete clicked for ID:', id);
     try {
       const res = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log('Delete response:', res.data);
-      fetchBlogs(token);
-    } catch (err) {
+      fetchBlogs(token!);
+    } catch (err: any) {
       console.error('Failed to delete blog:', err.response?.data || err.message);
     }
   };

@@ -37,7 +37,7 @@ export default function Footer() {
         <p className="font-normal text-sm">
           © {new Date().getFullYear()} NgJaBach - All Rights Reserved | Made by{' '}
           <a
-            href="https://www.facebook.com/dekuranvn/"
+            href="https://github.com/hoanghero125"
             target="_blank"
             rel="noopener noreferrer"
             className="text-red-300 dek-font dek-hover-effects text-[22px] align-middle transition-all duration-300"

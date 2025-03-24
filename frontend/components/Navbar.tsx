@@ -5,7 +5,7 @@ export default function Navbar() {
   return (
     <nav className="bg-[#0a1128] text-white py-3.5 px-4">
       <div className="max-w-[1325px] mx-auto flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold">
+        <Link href="/" className="text-3xl font-idealy relative top-[2px]">
           NgJaBach
         </Link>
         <div className="flex items-center space-x-6">

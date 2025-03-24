@@ -1,17 +1,28 @@
 @font-face {
-    font-family: 'DekHandwriting';
-    src: url('/fonts/DekHandwriting-Regular.ttf') format('truetype');
-  }
-  
-  .dek-font {
-    font-family: 'DekHandwriting', sans-serif;
-    line-height: 1;
-    vertical-align: middle;
-    position: relative;
-    top: 1px; 
-  }
-  
-  .dek-hover-effects:hover {
-    color: #ed571b;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 4px #ed571b;
-  }
+  font-family: 'Idealy';
+  src: url('/fonts/Idealy.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-idealy {
+  font-family: 'Idealy', sans-serif;
+}
+
+@font-face {
+  font-family: 'DekHandwriting';
+  src: url('/fonts/DekHandwriting-Regular.ttf') format('truetype');
+}
+
+.dek-font {
+  font-family: 'DekHandwriting', sans-serif;
+  line-height: 1;
+  vertical-align: middle;
+  position: relative;
+  top: 1px;
+}
+
+.dek-hover-effects:hover {
+  color: #ed571b;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 4px #ed571b;
+}

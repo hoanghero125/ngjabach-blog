@@ -10,6 +10,7 @@ import { useFooterAnimation } from '../context/FooterAnimationContext';
 interface Blog {
   _id: string;
   title: string;
+  slug: string; // Thêm trường slug
   content: string;
   createdAt: string;
 }
@@ -55,7 +56,7 @@ export default function Home() {
           <section className={`w-full ${blogs.length <= visibleCount ? 'mb-12' : ''}`}>
             <div className="space-y-6">
               {displayedBlogs.map((blog) => (
-                <Link href={`/post/${blog._id}`} key={blog._id} className="block" prefetch>
+                <Link href={`/post/${blog.slug}`} key={blog._id} className="block" prefetch>
                   <Card className="overflow-hidden rounded-xl hover:shadow-md transition-shadow cursor-pointer">
                     <CardContent className="p-6">
                       <h2 className="text-xl font-bold">{blog.title}</h2>

@@ -3,6 +3,7 @@ const router = express.Router();
 const Blog = require('../models/Blog');
 const authMiddleware = require('../middleware/auth');
 
+// Lấy bài post theo _id
 router.get('/:id', async (req, res) => {
   try {
     console.log('Requested blog ID:', req.params.id); // Debug
@@ -18,17 +19,35 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Lấy bài post theo slug
+router.get('/slug/:slug', async (req, res) => {
+  try {
+    console.log('Requested blog slug:', req.params.slug); // Debug
+    const blog = await Blog.findOne({ slug: req.params.slug });
+    console.log('Found blog by slug:', blog); // Debug
+    if (!blog) {
+      return res.status(404).json({ message: `Blog with slug "${req.params.slug}" not found` });
+    }
+    res.json(blog);
+  } catch (err) {
+    console.error('GET /slug/:slug error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Lấy tất cả bài post
 router.get('/', async (req, res) => {
   try {
     const blogs = await Blog.find();
     console.log('All blogs:', blogs); // Debug
     res.json(blogs);
   } catch (err) {
-    console.error(err);
+    console.error('GET / error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
+// Tạo bài post mới
 router.post('/', authMiddleware, async (req, res) => {
   try {
     const { title, content } = req.body;
@@ -36,11 +55,12 @@ router.post('/', authMiddleware, async (req, res) => {
     await blog.save();
     res.status(201).json(blog);
   } catch (err) {
-    console.error(err);
+    console.error('POST / error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
+// Cập nhật bài post
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const { title, content } = req.body;
@@ -52,11 +72,12 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (!blog) return res.status(404).json({ message: 'Blog not found' });
     res.json(blog);
   } catch (err) {
-    console.error(err);
+    console.error('PUT /:id error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
+// Xóa bài post
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
@@ -64,7 +85,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     await Blog.deleteOne({ _id: req.params.id });
     res.json({ message: 'Blog deleted' });
   } catch (err) {
-    console.error(err);
+    console.error('DELETE /:id error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });

@@ -8,7 +8,7 @@ export default function About() {
         <div className="max-w-[1325px] mx-auto">
           {/* About Me Section (including Skills & Expertise, Education, and Experience) */}
           <section className="mb-8">
-            <h1 className="text-4xl font-bold mb-6">About Me</h1>
+            <h1 className="text-5xl font-bold mb-6">About Me</h1>
             <div className="bg-white p-16 rounded-lg shadow-sm">
               <div className="flex flex-col md:flex-row gap-18">
                 {/* Avatar and Social Media */}

@@ -6,7 +6,7 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth(); // Sử dụng login từ useAuth
+  const { login } = useAuth(); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,7 +15,7 @@ export default function Login() {
         username,
         password,
       });
-      login(res.data.token); // Gọi login từ context, sẽ tự động cập nhật isAuthenticated và chuyển hướng
+      login(res.data.token); 
     } catch (err) {
       setError('Invalid credentials');
     }

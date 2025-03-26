@@ -35,7 +35,7 @@ export default function Footer() {
     >
       <div className="max-w-[1325px] w-full text-center">
         <p className="font-normal text-sm">
-          © {new Date().getFullYear()} NgJaBach - All Rights Reserved | Made by{' '}
+          © {new Date().getFullYear()} NgJaBach - All Rights Reserved | Designed & Developed with 💖 by {' '}
           <a
             href="https://github.com/hoanghero125"
             target="_blank"
@@ -44,7 +44,6 @@ export default function Footer() {
           >
             Dek
           </a>{' '}
-          with 💖
         </p>
       </div>
     </footer>

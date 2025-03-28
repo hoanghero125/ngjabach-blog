@@ -1,6 +1,3 @@
-
----
-
 # NgJaBach Blog
 
 **Website:** [ngjabach.blog](https://ngjabach.blog)

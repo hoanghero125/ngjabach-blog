@@ -1,12 +1,12 @@
-# NgJaBach Blog
+### **_NgJaBach Blog_**
 
 **Website:** [ngjabach.blog](https://ngjabach.blog)
 
-**Designed and Developed by:** [@hoanghero125](https://github.com/hoanghero125)
+**Designed and Developed by:** Đỗ Phạm Bảo Hoàng ([Dek](https://github.com/hoanghero125))
 
 ## Description
 
-This is the source code for NgJaBach Blog, a personal blog of Nguyen Gia Bach ([@ngjabach](https://github.com/NgJaBach)). The blog serves as a platform for sharing knowledge and insights about AI, machine learning, programming, and emerging technologies. It was built to create a space where tech enthusiasts can find valuable information, tutorials, and perspectives on the ever-evolving world of technology.
+This is the source code for NgJaBach Blog, a personal blog of ([Nguyen Gia Bach](https://github.com/NgJaBach)). The blog serves as a platform for sharing knowledge and insights about AI, machine learning, programming, and emerging technologies. It was built to create a space where tech enthusiasts can find valuable information, tutorials, and perspectives on the ever-evolving world of technology.
 
 ## Tech Stack
 

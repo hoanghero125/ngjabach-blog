@@ -24,3 +24,5 @@ export const useFooterAnimation = () => {
   }
   return context;
 };
+
+// haven't worked yet, maybe re-work in the future - Dek.

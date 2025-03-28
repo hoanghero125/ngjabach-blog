@@ -2,16 +2,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Search, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useSearch } from '../context/SearchContext';
 import { useEffect, useState } from 'react';
 
 export default function Navbar() {
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
-  const [isAdminPage, setIsAdminPage] = useState(false);
+  const { searchQuery, setSearchQuery } = useSearch();
+  const [isAdminPage, setIsAdminPage] = useState(false); 
 
   useEffect(() => {
     setIsAdminPage(router.pathname.startsWith('/admin'));
-  }, [router.pathname, isAuthenticated]);
+  }, [router.pathname, isAuthenticated]); 
 
   return (
     <nav className="bg-[#0a1128] text-white py-3.5 px-4">
@@ -34,7 +36,9 @@ export default function Navbar() {
               <input
                 type="text"
                 placeholder="Search..."
-                className="pl-10 pr-4 py-2 rounded-md bg-[#0a1128] border border-[#1a263f] text-gray-400 text-base focus:outline-none focus:ring-1 focus:ring-gray-300"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 py-2 rounded-xl bg-[#0a1128] border border-[#1a263f] text-gray-400 text-base focus:outline-none focus:ring-1 focus:ring-gray-300"
               />
             </div>
           )}

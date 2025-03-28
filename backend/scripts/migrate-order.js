@@ -22,7 +22,6 @@ const migrate = async () => {
       return;
     }
 
-    // Cập nhật order cho tất cả bài post, bất kể đã có order hay chưa
     for (let i = 0; i < blogs.length; i++) {
       blogs[i].order = i;
       await blogs[i].save();

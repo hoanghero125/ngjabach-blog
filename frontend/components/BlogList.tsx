@@ -16,10 +16,10 @@ export default function Home() {
     const fetchBlogs = async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blogs`);
-        console.log('Fetched blogs:', res.data);
+        // console.log('Fetched blogs:', res.data);
         setBlogs(res.data);
       } catch (err: any) {
-        console.error('Failed to fetch blogs:', err.response?.data || err.message);
+        // console.error('Failed to fetch blogs:', err.response?.data || err.message);
       }
     };
     fetchBlogs();

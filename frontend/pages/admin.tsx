@@ -53,7 +53,6 @@ const DraggableBlog = ({ blog, index, moveBlog, handleEdit, handleDelete, handle
     drop(node);
   };
 
-  // Loại bỏ trùng lặp trong tags
   const uniqueTags = [...new Set(blog.tags || ['General'])];
 
   return (
@@ -64,7 +63,6 @@ const DraggableBlog = ({ blog, index, moveBlog, handleEdit, handleDelete, handle
       <div className="flex-1">
         <h3 className="text-lg font-semibold text-black">{blog.title}</h3>
         <div className="flex items-center gap-6 mt-1">
-          {/* Nhóm 1: Date và icon Calendar */}
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-gray-500" />
             <p className="text-sm text-gray-500">
@@ -75,7 +73,6 @@ const DraggableBlog = ({ blog, index, moveBlog, handleEdit, handleDelete, handle
               })}
             </p>
           </div>
-          {/* Nhóm 2: Icon Tag và danh sách tags */}
           <div className="flex items-center gap-2">
             <Tag className="h-4 w-4 text-gray-500" />
             <div className="flex items-center gap-1 flex-wrap">
@@ -121,7 +118,6 @@ const DraggableBlog = ({ blog, index, moveBlog, handleEdit, handleDelete, handle
   );
 };
 
-// Phần còn lại của file (component Admin) giữ nguyên
 export default function Admin() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [token, setToken] = useState<string | null>(null);
@@ -147,7 +143,7 @@ export default function Admin() {
       setBlogs(res.data);
       setError(null);
     } catch (err: any) {
-      console.error('Failed to fetch blogs:', err.response?.data || err.message);
+      // console.error('Failed to fetch blogs:', err.response?.data || err.message);
       if (err.response?.status === 401) {
         localStorage.removeItem('token');
         setToken(null);
@@ -170,7 +166,7 @@ export default function Admin() {
       fetchBlogs(token!);
       setError(null);
     } catch (err: any) {
-      console.error('Failed to delete blog:', err.response?.data || err.message);
+      // console.error('Failed to delete blog:', err.response?.data || err.message);
       if (err.response?.status === 401) {
         localStorage.removeItem('token');
         setToken(null);
@@ -190,7 +186,7 @@ export default function Admin() {
 
     const id1 = originalBlogs[fromIndex]._id;
     const id2 = originalBlogs[toIndex]._id;
-    console.log('Swapping blogs:', { id1, fromIndex, id2, toIndex });
+    // console.log('Swapping blogs:', { id1, fromIndex, id2, toIndex });
 
     try {
       const swapUrl = `${process.env.NEXT_PUBLIC_API_URL}/blogs/swap/${id1}/${id2}`;
@@ -203,7 +199,7 @@ export default function Admin() {
       );
       setError(null);
     } catch (err: any) {
-      console.error('Failed to swap blog positions:', err.response?.data || err.message || err);
+      // console.error('Failed to swap blog positions:', err.response?.data || err.message || err);
       let errorMessage = 'Failed to swap blog positions.';
       if (err.response?.status === 404) {
         errorMessage = 'Swap endpoint not found. Please check if the backend server is running and the API URL is correct.';
@@ -242,13 +238,13 @@ export default function Admin() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="bg-[#FAF9F6] min-h-screen flex flex-col">
+      <div className="bg-[#FAF9F6] flex flex-col">
         <div className="container mx-auto px-4 pt-4 pb-8 flex-grow">
           <div className="max-w-[1325px] mx-auto">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-5xl font-bold text-black">Admin Panel</h1>
               <Link href="/admin/create-post">
-                <div className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition">
+                <div className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">
                   <Plus className="h-5 w-5" />
                   <span className="text-base font-medium">Create New Post</span>
                 </div>
@@ -259,7 +255,7 @@ export default function Admin() {
                 {error}
               </div>
             )}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
               <div className="mb-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -268,7 +264,7 @@ export default function Admin() {
                     placeholder="Search posts by title or tag..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -288,7 +284,7 @@ export default function Admin() {
                   />
                 ))}
               </div>
-              <div className="mt-4 text-sm text-gray-500">
+              <div className="mt-4 text-sm text-gray-500 rounded-lg">
                 Showing {filteredBlogs.length} of {blogs.length} posts
               </div>
             </div>

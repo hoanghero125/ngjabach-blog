@@ -22,7 +22,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(false);
     }
 
-    // Theo dõi sự kiện route change để cập nhật isAuthenticated
     const handleRouteChange = () => {
       const token = localStorage.getItem('token');
       setIsAuthenticated(!!token);
@@ -52,7 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       );
     } catch (err) {
-      console.error('Failed to logout:', err);
+      // console.error('Failed to logout:', err);
     } finally {
       localStorage.removeItem('token');
       setIsAuthenticated(false);

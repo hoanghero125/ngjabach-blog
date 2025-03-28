@@ -13,7 +13,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// Mã hóa password trước khi lưu
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);

@@ -10,27 +10,14 @@ const blogSchema = new mongoose.Schema({
 });
 
 blogSchema.pre('save', async function (next) {
-  if (this.isModified('title') || !this.slug) {
-    let baseSlug = this.title
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-') 
-      .replace(/-+/g, '-'); 
-
-    let slug = baseSlug;
-    let count = 0;
-    while (await mongoose.models.Blog.findOne({ slug, _id: { $ne: this._id } })) {
-      count++;
-      slug = `${baseSlug}-${count}`;
-    }
-    this.slug = slug;
-  }
+  // console.log('Blog pre(save) - Before:', { title: this.title, slug: this.slug, content: this.content, tags: this.tags });
 
   if (!this.order && this.order !== 0) {
     const lastBlog = await mongoose.models.Blog.findOne().sort({ order: -1 });
     this.order = lastBlog ? lastBlog.order + 1 : 0;
   }
 
+  // console.log('Blog pre(save) - After:', { title: this.title, slug: this.slug, content: this.content, tags: this.tags });
   next();
 });
 

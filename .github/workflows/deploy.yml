@@ -34,20 +34,19 @@ jobs:
           key: ${{ secrets.AWS_EC2_KEY }}
           script: |
             cd ~/ngjabach-blog
-            
-            # Pull latest code
             git pull origin main
-            
-            # Frontend
-            cd frontend
+
+            # Backend: Create .env
+            cd backend
+            echo "${{ secrets.BACKEND_ENV }}" > .env
+            npm install
+            pm2 restart ngjabach-backend || pm2 start npm --name "ngjabach-backend" -- start
+
+            # Frontend: Create .env.local
+            cd ../frontend
+            echo "${{ secrets.FRONTEND_ENV }}" > .env.local
             npm install
             npm run build
             pm2 restart ngjabach-frontend || pm2 start npm --name "ngjabach-frontend" -- start
-            
-            # Backend
-            cd ../backend
-            npm install
-            pm2 restart ngjabach-backend || pm2 start npm --name "ngjabach-backend" -- start
-            
-            # Save PM2 process list
+
             pm2 save

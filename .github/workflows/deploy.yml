@@ -36,17 +36,17 @@ jobs:
             cd ~/ngjabach-blog
             git pull origin main
 
-            # Backend: Create .env
+            # Backend
             cd backend
             echo "${{ secrets.BACKEND_ENV }}" > .env
             npm install
-            pm2 restart ngjabach-backend || pm2 start npm --name "ngjabach-backend" -- start
+            /usr/bin/pm2 restart ngjabach-backend || /usr/bin/pm2 start npm --name "ngjabach-backend" -- start
 
-            # Frontend: Create .env.local
+            # Frontend
             cd ../frontend
             echo "${{ secrets.FRONTEND_ENV }}" > .env.local
             npm install
             npm run build
-            pm2 restart ngjabach-frontend || pm2 start npm --name "ngjabach-frontend" -- start
+            /usr/bin/pm2 restart ngjabach-frontend || /usr/bin/pm2 start npm --name "ngjabach-frontend" -- start
 
-            pm2 save
+            /usr/bin/pm2 save

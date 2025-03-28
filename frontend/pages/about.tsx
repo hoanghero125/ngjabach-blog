@@ -9,7 +9,7 @@ export default function About() {
           {/* About Me Section (including Skills & Expertise, Education, and Experience) */}
           <section className="mb-8">
             <h1 className="text-5xl font-bold mb-6">About Me</h1>
-            <div className="bg-white p-16 rounded-lg shadow-sm">
+            <div className="bg-white p-16 rounded-xl shadow-sm">
               <div className="flex flex-col md:flex-row gap-18">
                 {/* Avatar and Social Media */}
                 <div className="flex flex-col items-start">
@@ -181,7 +181,7 @@ export default function About() {
           {/* My Projects Section */}
           <section className="mb-8">
             <h2 className="text-2xl font-bold mb-4">My Projects</h2>
-            <div className="bg-white p-10 rounded-lg shadow-sm">
+            <div className="bg-white p-10 rounded-xl shadow-sm">
               <p className="text-2xl font-bold italic text-center">Coming soon...</p>
             </div>
           </section>

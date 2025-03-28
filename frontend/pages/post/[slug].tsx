@@ -7,20 +7,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { Calendar, Clock, Tag, ArrowLeft, Link as LinkIcon, Copy } from 'lucide-react';
+import { Badge } from '../../components/ui/Badge'; 
 
-// Hàm tạo slug từ title
-const generateSlugFromTitle = (title: string): string => {
-  if (typeof title !== 'string') {
-    return '';
-  }
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-') // Thay khoảng trắng bằng dấu gạch ngang
-    .replace(/-+/g, '-'); // Loại bỏ nhiều dấu gạch ngang liên tiếp
-};
-
-// Hàm tạo ID từ nội dung tiêu đề (giữ ký tự có dấu)
 const generateIdFromText = (text: string): string => {
   if (typeof text !== 'string') {
     return '';
@@ -28,8 +16,8 @@ const generateIdFromText = (text: string): string => {
   return text
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, '-') // Thay khoảng trắng bằng dấu gạch ngang
-    .replace(/-+/g, '-'); // Loại bỏ nhiều dấu gạch ngang liên tiếp
+    .replace(/\s+/g, '-') 
+    .replace(/-+/g, '-');
 };
 
 interface Blog {
@@ -41,7 +29,6 @@ interface Blog {
   tags?: string[];
 }
 
-// Hàm tính thời gian đọc
 const calculateReadingTime = (content: string): number => {
   const wordsPerMinute = 200;
   const words = content.split(/\s+/).length;
@@ -67,7 +54,7 @@ export default function BlogPost() {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blogs/slug/${slug}`);
         setBlog(res.data);
       } catch (err) {
-        console.error('Failed to fetch blog:', err);
+        // console.error('Failed to fetch blog:', err);
         setBlog(null);
       } finally {
         setLoading(false);
@@ -84,7 +71,7 @@ export default function BlogPost() {
           .slice(0, 3);
         setOtherBlogs(filteredBlogs);
       } catch (err) {
-        console.error('Failed to fetch other blogs:', err);
+        // console.error('Failed to fetch other blogs:', err);
         setOtherBlogs([]);
       }
     };
@@ -103,7 +90,6 @@ export default function BlogPost() {
     }
   }, [router.asPath]);
 
-  // Hàm copy link
   const handleCopyLink = () => {
     const postUrl = `${window.location.origin}/post/${slug}`;
     navigator.clipboard.writeText(postUrl);
@@ -112,7 +98,7 @@ export default function BlogPost() {
   };
 
   return (
-    <div className="bg-[#FAF9F6] min-h-screen py-8 px-4">
+    <div className="bg-[#FAF9F6] py-8 px-4">
       {loading ? (
         <div className="max-w-[1325px] mx-auto text-gray-500">Loading...</div>
       ) : !blog ? (
@@ -123,13 +109,13 @@ export default function BlogPost() {
             href="/"
             className="group inline-flex items-center gap-2 p-2 rounded-md bg-[#FAF9F6] hover:bg-white hover:shadow-sm transition-all mb-6"
           >
-            <div className="w-8 h-8 flex items-center justify-center bg-white rounded-md group-hover:bg-[#FAF9F6]">
+            <div className="w-8 h-8 flex items-center justify-center bg-white rounded-lg group-hover:bg-[#FAF9F6]">
               <ArrowLeft className="h-4 w-4 text-blue-500" />
             </div>
             <span className="text-black">Back to all posts</span>
           </Link>
 
-          <div className="bg-white p-10 rounded-lg shadow-sm mb-8">
+          <div className="bg-white p-10 rounded-xl shadow-sm mb-8">
             <h1 className="text-4xl font-bold text-black mb-4">{blog.title}</h1>
 
             <div className="flex items-baseline gap-2 mb-8">
@@ -147,9 +133,19 @@ export default function BlogPost() {
                 <Clock className="h-4 w-4 relative top-[1px]" />
                 <span>{calculateReadingTime(blog.content)} min read</span>
               </div>
-              <div className="flex items-center gap-1 text-gray-500 text-sm">
+              <div className="flex items-center gap-2 text-gray-500 text-sm">
                 <Tag className="h-4 w-4 relative top-[1px]" />
-                <span>{blog.tags?.join(', ') || 'General'}</span>
+                <div className="flex flex-wrap gap-1">
+                  {(blog.tags && blog.tags.length > 0 ? blog.tags : ['General']).map((tag, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="rounded-full text-sm" 
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
               </div>
               <hr className="border-gray-200 border-1 flex-grow relative top-[-2px]" />
               <div className="flex items-center gap-3 ml-auto">
@@ -157,7 +153,7 @@ export default function BlogPost() {
                   <button
                     ref={copyButtonRef}
                     onClick={handleCopyLink}
-                    className="relative group flex items-center justify-center w-8 h-8 text-gray-500 hover:text-blue-500 transition-colors" // Đổi thành blue-500
+                    className="relative group flex items-center justify-center w-8 h-8 text-gray-500 hover:text-blue-500 transition-colors"
                     title="Copy link"
                   >
                     <div className="absolute inset-0 bg-gray-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -275,7 +271,7 @@ export default function BlogPost() {
                 <Link
                   key={otherBlog._id}
                   href={`/post/${otherBlog.slug}`}
-                  className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
                 >
                   <h3 className="text-2xl font-bold text-black mb-2">{otherBlog.title}</h3>
                   <p className="text-base text-gray-500 mb-2">
@@ -287,12 +283,13 @@ export default function BlogPost() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {(otherBlog.tags || ['General']).map((tag, index) => (
-                      <span
+                      <Badge
                         key={index}
-                        className="bg-gray-100 text-gray-800 text-base font-medium px-2 py-1 rounded"
+                        variant="secondary"
+                        className="rounded-full" 
                       >
                         {tag}
-                      </span>
+                      </Badge>
                     ))}
                   </div>
                 </Link>

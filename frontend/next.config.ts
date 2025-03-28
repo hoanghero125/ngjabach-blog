@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  transpilePackages: ['@uiw/react-markdown-preview', '@uiw/react-md-editor']
 };
 
 export default nextConfig;

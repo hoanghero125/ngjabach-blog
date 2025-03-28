@@ -2,33 +2,23 @@ const mongoose = require('mongoose');
 
 const blogSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  slug: { type: String, required: true, unique: true }, // Thêm trường slug, unique: true đã tự động tạo index
-  content: { type: String, required: true }, // Markdown content
+  slug: { type: String, required: true, unique: true }, 
+  content: { type: String, required: true }, 
+  tags: { type: [String], default: [] }, 
   createdAt: { type: Date, default: Date.now },
+  order: { type: Number, default: 0 }, 
 });
 
-// Tự động tạo slug từ title trước khi lưu
 blogSchema.pre('save', async function (next) {
-  if (this.isModified('title') || !this.slug) {
-    let baseSlug = this.title
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-') // Thay khoảng trắng bằng dấu gạch ngang
-      .replace(/-+/g, '-'); // Loại bỏ nhiều dấu gạch ngang liên tiếp
+  // console.log('Blog pre(save) - Before:', { title: this.title, slug: this.slug, content: this.content, tags: this.tags });
 
-    // Xử lý slug trùng lặp
-    let slug = baseSlug;
-    let count = 0;
-    while (await mongoose.models.Blog.findOne({ slug, _id: { $ne: this._id } })) {
-      count++;
-      slug = `${baseSlug}-${count}`;
-    }
-    this.slug = slug;
+  if (!this.order && this.order !== 0) {
+    const lastBlog = await mongoose.models.Blog.findOne().sort({ order: -1 });
+    this.order = lastBlog ? lastBlog.order + 1 : 0;
   }
+
+  // console.log('Blog pre(save) - After:', { title: this.title, slug: this.slug, content: this.content, tags: this.tags });
   next();
 });
-
-// Xóa dòng này vì unique: true đã tự động tạo index
-// blogSchema.index({ slug: 1 });
 
 module.exports = mongoose.model('Blog', blogSchema);

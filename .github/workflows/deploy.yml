@@ -1,0 +1,53 @@
+name: Deploy to AWS EC2
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.14'
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AWS_EC2_HOST }}
+          username: ${{ secrets.AWS_EC2_USER }}
+          key: ${{ secrets.AWS_EC2_KEY }}
+          script: |
+            cd ~/ngjabach-blog
+            
+            # Pull latest code
+            git pull origin main
+            
+            # Frontend
+            cd frontend
+            npm install
+            npm run build
+            pm2 restart ngjabach-frontend || pm2 start npm --name "ngjabach-frontend" -- start
+            
+            # Backend
+            cd ../backend
+            npm install
+            pm2 restart ngjabach-backend || pm2 start npm --name "ngjabach-backend" -- start
+            
+            # Save PM2 process list
+            pm2 save

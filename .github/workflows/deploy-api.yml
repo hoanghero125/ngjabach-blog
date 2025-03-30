@@ -2,8 +2,6 @@ name: Deploy API to AWS EC2
 on:
   push:
     branches: [production]
-    paths:
-      - 'backend/**'
 
 jobs:
   deploy:

@@ -2,8 +2,6 @@ name: Deploy Frontend to AWS EC2
 on:
   push:
     branches: [production]
-    paths:
-      - 'frontend/**'
 
 jobs:
   deploy:

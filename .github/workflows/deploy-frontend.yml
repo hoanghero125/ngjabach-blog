@@ -1,0 +1,33 @@
+name: Deploy Frontend to AWS EC2
+on:
+  push:
+    branches: [production]
+    paths:
+      - 'frontend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.14'
+
+      - name: Deploy Frontend
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AWS_EC2_HOST }}
+          username: ${{ secrets.AWS_EC2_USER }}
+          key: ${{ secrets.AWS_EC2_KEY }}
+          script: |
+            cd ~/ngjabach-blog/frontend
+            git pull origin main
+            echo "${{ secrets.FRONTEND_ENV }}" > .env.local
+            npm install
+            npm run build
+            pm2 restart ngjabach-frontend || pm2 start npm --name "ngjabach-frontend" -- run start -- -p 3000
+            pm2 save

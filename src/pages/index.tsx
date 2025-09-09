@@ -66,7 +66,7 @@ export default function Home() {
                 {/* Information, Description, Skills, Education, and Experience */}
                 <div className="flex-1">
                   <h2 className="text-4xl font-bold italic mb-1">Nguyễn Gia Bách</h2>
-                  <p className="text-sm text-gray-500 mb-4">
+                  <p className="text-sm text-gray-500 mb-4 mt-2">
                     19 years old • Hanoi, Vietnam VN
                   </p>
                   <div className="mb-6">

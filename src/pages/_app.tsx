@@ -1,4 +1,5 @@
 import type { AppProps } from 'next/app';
+import Head from 'next/head';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { FooterAnimationProvider } from '@/context/FooterAnimationContext';
@@ -16,6 +17,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <div className="flex flex-col min-h-screen">
             <Navbar />
             <main className="flex-grow bg-[#FAF9F6]">
+                <Head>
+                  <title>NgJaBach Blog</title>
+                </Head>
               <Component {...pageProps} />
             </main>
             <Footer />

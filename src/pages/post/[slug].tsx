@@ -24,6 +24,18 @@ const generateIdFromText = (text: string): string => {
     .replace(/-+/g, '-');
 };
 
+const extractToc = (content: string) => {
+  return content
+    .split('\n')
+    .filter(line => /^#{1,3} /.test(line))
+    .map(line => {
+      const level = line.match(/^(#{1,3})/)?.[1].length || 1;
+      const text = line.replace(/^#{1,3} /, '').replace(/[*_`[\]]/g, '').replace(/\(.*?\)/g, '').trim();
+      const id = generateIdFromText(text);
+      return { level, text, id };
+    });
+};
+
 interface Blog {
   _id: string;
   title: string;
@@ -90,7 +102,18 @@ export default function BlogPost() {
   const [otherBlogs, setOtherBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
+  const [readingProgress, setReadingProgress] = useState(0);
   const copyButtonRef = useRef<HTMLButtonElement>(null);
+
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const total = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      setReadingProgress(total > 0 ? (window.scrollY / total) * 100 : 0);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     if (!slug) return;
@@ -144,6 +167,12 @@ export default function BlogPost() {
 
   return (
     <div className="bg-[#FAF9F6] py-8 px-4">
+      {/* Reading progress bar */}
+      <div
+        className="fixed top-0 left-0 h-0.5 bg-blue-500 z-50 transition-[width] duration-75"
+        style={{ width: `${readingProgress}%` }}
+      />
+
       {loading ? (
         <div className="max-w-[1325px] mx-auto text-gray-500">Loading...</div>
       ) : !blog ? (
@@ -161,11 +190,11 @@ export default function BlogPost() {
           </Link>
 
           <div className="bg-white p-10 rounded-xl shadow-sm mb-8">
-            <h1 className="text-4xl font-bold text-black mb-4">{blog.title}</h1>
+            <h1 className="text-5xl font-bold text-black mb-4">{blog.title}</h1>
 
-            <div className="flex items-baseline gap-2 mb-8">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-8">
               <div className="flex items-center gap-1 text-gray-500 text-sm">
-                <Calendar className="h-4 w-4 relative top-[1px]" />
+                <Calendar className="h-4 w-4" />
                 <span>
                   {new Date(blog.createdAt).toLocaleDateString('en-US', {
                     day: 'numeric',
@@ -175,11 +204,11 @@ export default function BlogPost() {
                 </span>
               </div>
               <div className="flex items-center gap-1 text-gray-500 text-sm">
-                <Clock className="h-4 w-4 relative top-[1px]" />
+                <Clock className="h-4 w-4" />
                 <span>{calculateReadingTime(blog.content)} min read</span>
               </div>
               <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <Tag className="h-4 w-4 relative top-[1px]" />
+                <Tag className="h-4 w-4" />
                 <div className="flex flex-wrap gap-1">
                   {(blog.tags && blog.tags.length > 0 ? blog.tags : ['General']).map((tag, index) => (
                     <Badge
@@ -192,24 +221,21 @@ export default function BlogPost() {
                   ))}
                 </div>
               </div>
-              <hr className="border-gray-200 border-1 flex-grow relative top-[-2px]" />
-              <div className="flex items-center gap-3 ml-auto">
-                <div className="relative">
-                  <button
-                    ref={copyButtonRef}
-                    onClick={handleCopyLink}
-                    className="relative group flex items-center justify-center w-8 h-8 text-gray-500 hover:text-blue-500 transition-colors"
-                    title="Copy link"
-                  >
-                    <div className="absolute inset-0 bg-gray-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <Copy className="h-5 w-5 relative z-10" />
-                  </button>
-                  {showCopyPopup && (
-                    <div className="absolute right-0 top-10 bg-gray-800 text-white text-sm px-2 py-1 rounded shadow-lg">
-                      Link copied!
-                    </div>
-                  )}
-                </div>
+              <div className="ml-auto relative">
+                <button
+                  ref={copyButtonRef}
+                  onClick={handleCopyLink}
+                  className="relative group flex items-center justify-center w-8 h-8 text-gray-500 hover:text-blue-500 transition-colors"
+                  title="Copy link"
+                >
+                  <div className="absolute inset-0 bg-gray-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <Copy className="h-5 w-5 relative z-10" />
+                </button>
+                {showCopyPopup && (
+                  <div className="absolute right-0 top-10 bg-gray-800 text-white text-sm px-2 py-1 rounded shadow-lg whitespace-nowrap">
+                    Link copied!
+                  </div>
+                )}
               </div>
             </div>
 
@@ -237,11 +263,28 @@ export default function BlogPost() {
                       className="w-full h-auto rounded-lg"
                     />
                   ),
-                  a: ({ href, children }) => (
-                    <a href={href} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">
-                      {children}
-                    </a>
-                  ),
+                  a: ({ href, children }) => {
+                    if (href?.startsWith('#')) {
+                      return (
+                        <a
+                          href={href}
+                          className="text-blue-500 hover:underline"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            history.pushState(null, '', href);
+                            document.getElementById(href.slice(1))?.scrollIntoView();
+                          }}
+                        >
+                          {children}
+                        </a>
+                      );
+                    }
+                    return (
+                      <a href={href} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">
+                        {children}
+                      </a>
+                    );
+                  },
                   table: ({ children }) => (
                     <div className="overflow-x-auto my-6">
                       <table className="border-collapse border border-gray-300 w-full">{children}</table>
@@ -274,8 +317,7 @@ export default function BlogPost() {
                             className="absolute right-0 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => {
                               e.preventDefault();
-                              router.push(`/post/${blog.slug}#${headingId}`, undefined, { scroll: false });
-                              document.getElementById(headingId)?.scrollIntoView({ behavior: 'smooth' });
+                              history.pushState(null, '', `#${headingId}`);
                             }}
                           >
                             <LinkIcon className="h-5 w-5 text-gray-500 hover:text-blue-500" />
@@ -298,8 +340,7 @@ export default function BlogPost() {
                             className="absolute right-0 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => {
                               e.preventDefault();
-                              router.push(`/post/${blog.slug}#${headingId}`, undefined, { scroll: false });
-                              document.getElementById(headingId)?.scrollIntoView({ behavior: 'smooth' });
+                              history.pushState(null, '', `#${headingId}`);
                             }}
                           >
                             <LinkIcon className="h-5 w-5 text-gray-500 hover:text-blue-500" />
@@ -319,8 +360,7 @@ export default function BlogPost() {
                             className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => {
                               e.preventDefault();
-                              router.push(`/post/${blog.slug}#${headingId}`, undefined, { scroll: false });
-                              document.getElementById(headingId)?.scrollIntoView({ behavior: 'smooth' });
+                              history.pushState(null, '', `#${headingId}`);
                             }}
                           >
                             <LinkIcon className="inline h-4 w-4 text-gray-400 hover:text-blue-500" />
@@ -375,12 +415,12 @@ export default function BlogPost() {
                   ),
                 }}
               >
-                {blog.content}
+                {blog.content.replace(/<!--[\s\S]*?-->/g, '')}
               </ReactMarkdown>
             </div>
           </div>
 
-          <div>
+          {otherBlogs.length > 0 && <div>
             <h2 className="text-3xl font-bold mb-4">Other posts</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {otherBlogs.map((otherBlog) => (
@@ -399,19 +439,13 @@ export default function BlogPost() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {(otherBlog.tags || ['General']).map((tag, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="rounded-full"
-                      >
-                        {tag}
-                      </Badge>
+                      <Badge key={index} variant="secondary" className="rounded-full">{tag}</Badge>
                     ))}
                   </div>
                 </Link>
               ))}
             </div>
-          </div>
+          </div>}
         </div>
       )}
     </div>

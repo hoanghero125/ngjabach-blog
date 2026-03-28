@@ -29,7 +29,7 @@ export default function Footer() {
 
   return (
     <footer
-      className={`bg-[#0a1128] text-white py-5.5 flex justify-center items-center w-full ${
+      className={`bg-[#0a1128] text-white py-5 flex justify-center items-center w-full ${
         animate ? 'fade-out-down' : ''
       }`}
     >

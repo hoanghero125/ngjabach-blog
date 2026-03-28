@@ -211,6 +211,11 @@ export default function CreatePost() {
       }
       router.push('/admin');
     } catch (err: any) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        router.push('/admin/login');
+        return;
+      }
       const errorMessage = err.response?.data?.message || 'Failed to save the post. Please try again.';
       setError(errorMessage);
     }

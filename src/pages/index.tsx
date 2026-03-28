@@ -6,185 +6,127 @@ export default function Home() {
     <div className="bg-[#FAF9F6] flex flex-col">
       <div className="px-4 py-4 flex-grow">
         <div className="max-w-[1325px] mx-auto">
-          {/* About Me Section (including Skills & Expertise, Education, and Experience) */}
-          <section className="mb-8">
-            {/* <h1 className="text-5xl font-bold mb-6">About Me</h1> */}
-            <div className="bg-white p-16 rounded-xl shadow-sm mt-8 ">
-              <div className="flex flex-col md:flex-row gap-18">
-                {/* Avatar and Social Media */}
-                <div className="flex flex-col items-start">
+
+          {/* Hero */}
+          <section className="mb-6 mt-8">
+            <div className="bg-white rounded-xl shadow-sm p-8 md:p-12">
+              <div className="flex flex-col md:flex-row gap-10 md:gap-16">
+
+                {/* Avatar + Social */}
+                <div className="flex flex-col items-center md:items-start flex-shrink-0">
                   <img
                     src="/img/ngjabach.jpg"
                     alt="Nguyen Gia Bach"
-                    className="w-[320px] h-[320px] rounded-full flex-shrink-0 mb-4 object-cover border-8 border-white drop-shadow-md"
+                    className="w-48 h-48 md:w-[320px] md:h-[320px] rounded-full object-cover ring-4 ring-gray-100 shadow-md mb-5"
                   />
-                  <div className="w-[320px] space-y-2">
-                    <a
-                      href="mailto:ngbach2008@gmail.com"
-                      className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 hover:shadow-sm transition-all"
-                    >
-                      <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-md">
-                        <Mail className="h-5 w-5 text-blue-500" />
-                      </div>
-                      <span className="text-black">ngbach2008@gmail.com</span>
-                    </a>
-                    <a
-                      href="https://github.com/ngjabach"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 hover:shadow-sm transition-all"
-                    >
-                      <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-md">
-                        <Github className="h-5 w-5 text-blue-500" />
-                      </div>
-                      <span className="text-black">NgJaBach</span>
-                    </a>
-                    <a
-                      href="https://linkedin.com/in/ngjabach"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 hover:shadow-sm transition-all"
-                    >
-                      <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-md">
-                        <Linkedin className="h-5 w-5 text-blue-500" />
-                      </div>
-                      <span className="text-black">ngjabach</span>
-                    </a>
-                    <a
-                      href="https://facebook.com/ngjabach"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 hover:shadow-sm transition-all"
-                    >
-                      <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-md">
-                        <Facebook className="h-5 w-5 text-blue-500" />
-                      </div>
-                      <span className="text-black">Nguyễn Gia Bách</span>
-                    </a>
+                  <div className="w-full md:w-72 space-y-1.5">
+                    {[
+                      { href: 'mailto:ngbach2008@gmail.com', icon: <Mail className="h-4 w-4 text-blue-500" />, label: 'ngbach2008@gmail.com' },
+                      { href: 'https://github.com/ngjabach', icon: <Github className="h-4 w-4 text-blue-500" />, label: 'NgJaBach', external: true },
+                      { href: 'https://linkedin.com/in/ngjabach', icon: <Linkedin className="h-4 w-4 text-blue-500" />, label: 'ngjabach', external: true },
+                      { href: 'https://facebook.com/ngjabach', icon: <Facebook className="h-4 w-4 text-blue-500" />, label: 'Nguyễn Gia Bách', external: true },
+                    ].map(({ href, icon, label, external }) => (
+                      <a
+                        key={href}
+                        href={href}
+                        {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-md flex-shrink-0">
+                          {icon}
+                        </div>
+                        <span className="text-sm text-black truncate">{label}</span>
+                      </a>
+                    ))}
                   </div>
                 </div>
-                {/* Information, Description, Skills, Education, and Experience */}
-                <div className="flex-1">
-                  <h2 className="text-4xl font-bold italic mb-1">Nguyễn Gia Bách</h2>
-                  <p className="text-sm text-gray-500 mb-4 mt-2">
-                    19 years old • Hanoi, Vietnam VN
-                  </p>
-                  <div className="mb-6">
-                    <p className="text-base mb-3">
-                      I have a PHD (Pretty Huge Dream) in Computer Science.
-                    </p>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0 flex flex-col gap-8">
+
+                  {/* Header */}
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-[0.25em] text-blue-500">About Me</span>
+                    <h1 className="text-5xl font-extrabold italic mt-2 mb-2">Nguyễn Gia Bách</h1>
+                    <p className="text-sm text-gray-400 mb-3">19 years old · Hanoi, Vietnam</p>
+                    <p className="text-base text-gray-600">I have a PHD (Pretty Huge Dream) in Computer Science.</p>
                   </div>
-                  {/* Skills & Expertise */}
-                  <div className="mb-6">
-                    <div className="flex items-baseline gap-1 mb-4">
-                      <h2 className="text-2xl font-bold whitespace-nowrap">Skills & Expertise</h2>
-                      <hr className="border-gray-200 border-1 flex-grow" />
+
+                  {/* Skills */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Skills & Expertise</span>
+                      <div className="h-px bg-gray-100 flex-grow" />
                     </div>
-                    <div className="flex flex-wrap gap-3">
-                      {[
-                        'C++',
-                        'Python',
-                        'LaTeX',
-                        'Competitive Programming',
-                        'Machine Learning',
-                        'Deep Learning',
-                        'Data Visualization',
-                        'Research',
-                        'Technical Writing',
-                      ].map((skill, index) => (
-                        <span
-                          key={index}
-                          className="bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded-full"
-                        >
+                    <div className="flex flex-wrap gap-2">
+                      {['C++', 'Python', 'LaTeX', 'Competitive Programming', 'Machine Learning', 'Deep Learning', 'Data Visualization', 'Research', 'Technical Writing'].map((skill) => (
+                        <span key={skill} className="bg-gray-100 text-gray-700 text-sm font-medium px-3 py-1 rounded-full">
                           {skill}
                         </span>
                       ))}
                     </div>
                   </div>
+
                   {/* Education */}
-                  <div className="mb-6">
-                    <div className="flex items-baseline gap-1 mb-4">
-                      <h2 className="text-2xl font-bold whitespace-nowrap">Education</h2>
-                      <hr className="border-gray-200 border-1 flex-grow" />
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Education</span>
+                      <div className="h-px bg-gray-100 flex-grow" />
                     </div>
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="text-lg font-bold text-black">
-                            Informatics
-                          </p>
-                          <p className="text-base text-gray-500">
-                            Chu Van An National High School for the Gifted
-                          </p>
+                    <div className="space-y-5">
+                      {[
+                        { title: 'Informatics', org: 'Chu Van An National High School for the Gifted', location: 'Hanoi, Vietnam', period: 'Sep. 2021 – Jun 2024' },
+                        { title: 'Bachelor of Science in Computer Science', org: 'Hanoi University of Science and Technology', location: 'Hanoi, Vietnam', period: 'Aug. 2024 – Present' },
+                      ].map((item) => (
+                        <div key={item.title} className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
+                          <div>
+                            <p className="font-bold text-black">{item.title}</p>
+                            <p className="text-sm text-gray-500 mt-0.5">{item.org}</p>
+                          </div>
+                          <div className="sm:text-right flex-shrink-0">
+                            <p className="text-sm text-blue-500 font-light italic">{item.location}</p>
+                            <p className="text-sm text-gray-400 font-light italic mt-0.5">{item.period}</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-base text-red-500 font-light italic">
-                            Hanoi, Vietnam
-                          </p>
-                          <p className="text-base text-gray-500 font-light italic">
-                            Sep. 2021 - Jun 2024
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="text-lg font-bold text-black">
-                            Bachelor of Science in Computer Science
-                          </p>
-                          <p className="text-base text-gray-500">
-                            Hanoi University of Science and Technology
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-base text-red-500 font-light italic">
-                            Hanoi, Vietnam
-                          </p>
-                          <p className="text-base text-gray-500 font-light italic">
-                            Aug. 2024 - Present
-                          </p>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
+
                   {/* Experience */}
                   <div>
-                    <div className="flex items-baseline gap-1 mb-4">
-                      <h2 className="text-2xl font-bold whitespace-nowrap">Experience</h2>
-                      <hr className="border-gray-200 border-1 flex-grow" />
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Experience</span>
+                      <div className="h-px bg-gray-100 flex-grow" />
                     </div>
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="text-lg font-bold text-black">
-                            Junior Researcher
-                          </p>
-                          <p className="text-base text-gray-500">
-                            Business AI Lab - National Economics University
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-base text-red-500 font-light italic">
-                            Hanoi, Vietnam
-                          </p>
-                          <p className="text-base text-gray-500 font-light italic">
-                            Aug. 2024 - Present
-                          </p>
-                        </div>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
+                      <div>
+                        <p className="font-bold text-black">Junior Researcher</p>
+                        <p className="text-sm text-gray-500 mt-0.5">Business AI Lab – National Economics University</p>
+                      </div>
+                      <div className="sm:text-right flex-shrink-0">
+                        <p className="text-sm text-blue-500 font-light italic">Hanoi, Vietnam</p>
+                        <p className="text-sm text-gray-400 font-light italic mt-0.5">Aug. 2024 – Present</p>
                       </div>
                     </div>
                   </div>
+
                 </div>
+
               </div>
             </div>
           </section>
 
-          {/* My Projects Section */}
+          {/* Projects */}
           <section className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">My Projects</h2>
-            <div className="bg-white p-10 rounded-xl shadow-sm">
-              <p className="text-2xl font-bold italic text-center">Coming soon...</p>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-2xl font-extrabold leading-none">Publications</h2>
+              <div className="h-[2px] bg-gray-200 flex-grow" />
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-10">
+              <p className="text-2xl font-bold italic text-center text-gray-400">Coming soon...</p>
             </div>
           </section>
+
         </div>
       </div>
     </div>

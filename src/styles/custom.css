@@ -26,3 +26,26 @@
   color: #ed571b;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 4px #ed571b;
 }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* KaTeX — prevent Tailwind table reset from breaking matrix/cases environments */
+.katex table {
+  display: inline-table;
+  border-collapse: collapse;
+  border: none;
+  width: auto;
+}
+.katex td, .katex th {
+  border: none;
+  padding: 0;
+  background: none;
+  text-align: left;
+}
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}

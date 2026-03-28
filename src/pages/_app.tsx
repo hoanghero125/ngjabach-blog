@@ -6,6 +6,8 @@ import { FooterAnimationProvider } from '@/context/FooterAnimationContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { SearchProvider } from '@/context/SearchContext';
 import '@/styles/globals.css';
+import 'katex/dist/katex.min.css';
+import 'highlight.js/styles/github.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
 
@@ -16,7 +18,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <SearchProvider>
           <div className="flex flex-col min-h-screen">
             <Navbar />
-            <main className="flex-grow bg-[#FAF9F6]">
+            <main className="flex-grow flex flex-col bg-[#FAF9F6]">
                 <Head>
                   <title>NgJaBach Blog</title>
                 </Head>

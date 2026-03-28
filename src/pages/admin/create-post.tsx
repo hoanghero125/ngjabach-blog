@@ -1,15 +1,116 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
-import { ArrowLeft, Save, Plus, X, Upload } from 'lucide-react';
+import { ArrowLeft, Save, Plus, X, Upload, Copy, Check } from 'lucide-react';
 import slugify from 'slugify';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import remarkEmoji from 'remark-emoji';
+import rehypeRaw from 'rehype-raw';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeKatex from 'rehype-katex';
 
 const MDEditor = dynamic(
   () => import('@uiw/react-md-editor').then((mod) => mod.default),
   { ssr: false }
 );
+
+function CodeBlock({ children }: { children: React.ReactNode }) {
+  const [copied, setCopied] = useState(false);
+  const preRef = useRef<HTMLPreElement>(null);
+
+  const handleCopy = () => {
+    const text = preRef.current?.querySelector('code')?.textContent || '';
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const codeChild = React.Children.toArray(children)[0] as React.ReactElement<{ className?: string }>;
+  const langClass = codeChild?.props?.className || '';
+  const lang = langClass.match(/language-(\w+)/)?.[1] || '';
+
+  return (
+    <div className="relative my-4 rounded-lg overflow-hidden border border-gray-200">
+      <div className="flex items-center justify-between px-4 py-2 bg-gray-100 border-b border-gray-200">
+        <span className="text-xs font-mono text-gray-500">{lang || 'code'}</span>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+        >
+          {copied ? (
+            <>
+              <Check className="h-3.5 w-3.5 text-green-500" />
+              <span className="text-green-500">Copied!</span>
+            </>
+          ) : (
+            <>
+              <Copy className="h-3.5 w-3.5" />
+              <span>Copy</span>
+            </>
+          )}
+        </button>
+      </div>
+      <pre ref={preRef} className="overflow-x-auto p-4 m-0 text-sm leading-relaxed bg-gray-50">
+        {children}
+      </pre>
+    </div>
+  );
+}
+
+const markdownPreviewOptions = {
+  remarkPlugins: [remarkGfm, remarkMath, remarkEmoji],
+  rehypePlugins: [rehypeRaw, rehypeKatex, rehypeHighlight],
+  components: {
+    pre: ({ children }: { children?: React.ReactNode }) => <CodeBlock>{children}</CodeBlock>,
+    code: ({ className, children }: { className?: string; children?: React.ReactNode }) => {
+      const isBlock = className?.includes('language-') || className?.includes('hljs');
+      if (isBlock) return <code className={className}>{children}</code>;
+      return (
+        <code className="bg-gray-100 rounded px-1.5 py-0.5 text-sm font-mono text-rose-600">
+          {children}
+        </code>
+      );
+    },
+    ul: ({ children }: { children?: React.ReactNode }) => (
+      <ul className="list-disc list-outside pl-6 mb-4 space-y-1">{children}</ul>
+    ),
+    ol: ({ children }: { children?: React.ReactNode }) => (
+      <ol className="list-decimal list-outside pl-6 mb-4 space-y-1">{children}</ol>
+    ),
+    li: ({ children }: { children?: React.ReactNode }) => (
+      <li className="text-base leading-relaxed">{children}</li>
+    ),
+    hr: () => <hr className="my-6 border-gray-200" />,
+    strong: ({ children }: { children?: React.ReactNode }) => (
+      <strong className="font-bold">{children}</strong>
+    ),
+    em: ({ children }: { children?: React.ReactNode }) => <em className="italic">{children}</em>,
+    del: ({ children }: { children?: React.ReactNode }) => (
+      <del className="line-through text-gray-400">{children}</del>
+    ),
+    blockquote: ({ children }: { children?: React.ReactNode }) => (
+      <blockquote className="border-l-4 border-gray-300 pl-6 italic my-4 text-gray-500">
+        {children}
+      </blockquote>
+    ),
+    table: ({ children }: { children?: React.ReactNode }) => (
+      <div className="overflow-x-auto my-4">
+        <table className="border-collapse border border-gray-300 w-full">{children}</table>
+      </div>
+    ),
+    th: ({ children }: { children?: React.ReactNode }) => (
+      <th className="border border-gray-300 px-4 py-2 bg-gray-100 font-semibold text-left text-sm">
+        {children}
+      </th>
+    ),
+    td: ({ children }: { children?: React.ReactNode }) => (
+      <td className="border border-gray-300 px-4 py-2 text-sm">{children}</td>
+    ),
+  },
+};
 
 interface Blog {
   _id?: string;
@@ -99,7 +200,6 @@ export default function CreatePost() {
       content: blog.content,
       tags: blog.tags,
     };
-    // console.log('Data being sent to backend:', payload);
 
     try {
       setError(null);
@@ -111,7 +211,6 @@ export default function CreatePost() {
       }
       router.push('/admin');
     } catch (err: any) {
-      // console.error('Failed to save blog:', err.response?.data || err.message);
       const errorMessage = err.response?.data?.message || 'Failed to save the post. Please try again.';
       setError(errorMessage);
     }
@@ -216,6 +315,7 @@ export default function CreatePost() {
                   preview="live"
                   height={650}
                   className="border border-gray-300 rounded-lg"
+                  previewOptions={markdownPreviewOptions}
                 />
               </div>
             </div>

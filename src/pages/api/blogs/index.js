@@ -21,7 +21,7 @@ async function handler(req, res) {
   switch (method) {
     case 'GET':
       try {
-        const blogs = await Blog.find().sort({ order: 1 });
+        const blogs = await Blog.find().sort({ order: -1 });
         res.json(blogs);
       } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });

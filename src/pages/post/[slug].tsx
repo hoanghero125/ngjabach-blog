@@ -415,7 +415,7 @@ export default function BlogPost() {
                   ),
                 }}
               >
-                {blog.content.replace(/<!--[\s\S]*?-->/g, '')}
+                {blog.content.replace(/<!--[\s\S]*?-->/g, '').replace(/<!--/g, '').replace(/-->/g, '')}
               </ReactMarkdown>
             </div>
           </div>

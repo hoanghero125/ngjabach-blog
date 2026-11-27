@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  // Incremented to revoke every existing session (logout, password reset).
+  tokenVersion: {
+    type: Number,
+    default: 0,
+  },
 });
 
 userSchema.pre('save', async function (next) {

@@ -1,73 +1,44 @@
-const mongoose = require('mongoose');
 const dbConnect = require('../../../lib/db');
 const Blog = require('../../../lib/models/Blog');
-const authMiddleware = require('../../../lib/middleware/auth');
+const { requireAuth } = require('../../../lib/auth');
+const { validateBlogInput } = require('../../../lib/validate');
+const { generateUniqueSlug } = require('../../../lib/blogs');
 
-const generateUniqueSlug = async (baseSlug, excludeId = null) => {
-  let slug = baseSlug;
-  let count = 0;
-  while (await Blog.findOne({ slug, _id: { $ne: excludeId } })) {
-    count++;
-    slug = `${baseSlug}-${count}`;
-  }
-  return slug;
-};
-
-async function handler(req, res) {
-  await dbConnect();
-  
-  const { method } = req;
-
-  switch (method) {
-    case 'GET':
-      try {
-        const blogs = await Blog.find().sort({ order: -1 });
-        res.json(blogs);
-      } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
-      }
-      break;
-
-    case 'POST':
-      try {
-        const { title, slug, content, tags } = req.body;
-
-        if (!title || !slug || !content) {
-          return res.status(400).json({ message: 'Title, slug, and content are required' });
-        }
-
-        const trimmedSlug = slug.trim();
-        const uniqueSlug = await generateUniqueSlug(trimmedSlug);
-
-        const blogData = {
-          title,
-          slug: uniqueSlug,
-          content,
-          tags: tags || [],
-        };
-
-        const blog = new Blog(blogData);
-        await blog.save();
-
-        const blogCount = await Blog.countDocuments();
-        blog.order = blogCount - 1;
-        await blog.save();
-
-        res.status(201).json(blog);
-      } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
-      }
-      break;
-
-    default:
-      res.setHeader('Allow', ['GET', 'POST']);
-      res.status(405).end(`Method ${method} Not Allowed`);
+async function listBlogs(req, res) {
+  try {
+    await dbConnect();
+    const blogs = await Blog.find().sort({ order: -1 });
+    return res.status(200).json(blogs);
+  } catch (err) {
+    console.error('List blogs error:', err);
+    return res.status(500).json({ message: 'Server error' });
   }
 }
 
-export default function apiHandler(req, res) {
-  if (req.method === 'POST') {
-    return authMiddleware(handler)(req, res);
+async function createBlog(req, res) {
+  const { value, error } = validateBlogInput(req.body);
+  if (error) return res.status(400).json({ message: error });
+
+  try {
+    await dbConnect();
+    const slug = await generateUniqueSlug(value.slug);
+    const top = await Blog.findOne().sort({ order: -1 }).select('order');
+    const blog = await Blog.create({ ...value, slug, order: top ? top.order + 1 : 0 });
+    return res.status(201).json(blog);
+  } catch (err) {
+    if (err?.code === 11000) {
+      return res.status(409).json({ message: 'A post with this slug already exists' });
+    }
+    console.error('Create blog error:', err);
+    return res.status(500).json({ message: 'Server error' });
   }
-  return handler(req, res);
+}
+
+const protectedCreate = requireAuth(createBlog);
+
+export default function handler(req, res) {
+  if (req.method === 'GET') return listBlogs(req, res);
+  if (req.method === 'POST') return protectedCreate(req, res);
+  res.setHeader('Allow', ['GET', 'POST']);
+  return res.status(405).json({ message: 'Method not allowed' });
 }

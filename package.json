@@ -52,5 +52,8 @@
     "style-loader": "^4.0.0",
     "tailwindcss": "^4",
     "typescript": "^5.8.2"
+  },
+  "overrides": {
+    "postcss": "^8.5.27"
   }
 }

@@ -42,7 +42,10 @@ export default function CreatePost() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const id = typeof router.query.id === 'string' ? router.query.id : undefined;
+  // Only a real post id (24 hex characters) is ever put into a request URL.
+  const rawId = router.query.id;
+  const id = typeof rawId === 'string' && /^[a-f0-9]{24}$/i.test(rawId) ? rawId : undefined;
+  const invalidId = rawId !== undefined && !id;
 
   useEffect(() => {
     if (status !== 'authenticated' || !router.isReady || !id) return;
@@ -50,7 +53,7 @@ export default function CreatePost() {
     const fetchBlog = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`/api/blogs/${id}`);
+        const res = await axios.get(`/api/blogs/${encodeURIComponent(id)}`);
         if (cancelled) return;
         const fetched = res.data;
         setBlog({
@@ -130,7 +133,7 @@ export default function CreatePost() {
     setError(null);
     try {
       if (id) {
-        await axios.put(`/api/blogs/${id}`, payload);
+        await axios.put(`/api/blogs/${encodeURIComponent(id)}`, payload);
       } else {
         await axios.post('/api/blogs', payload);
       }
@@ -148,6 +151,13 @@ export default function CreatePost() {
   };
 
   if (status !== 'authenticated') return null;
+  if (invalidId) {
+    return (
+      <div className="container mx-auto p-4">
+        This edit link is not valid. <Link href="/admin" className="text-blue-500 hover:underline">Back to Admin Panel</Link>
+      </div>
+    );
+  }
   if (loading) return <div className="container mx-auto p-4">Loading...</div>;
 
   return (

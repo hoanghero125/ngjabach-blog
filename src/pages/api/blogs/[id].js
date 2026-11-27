@@ -18,14 +18,16 @@ async function getBlog(req, res, id) {
 
 async function updateBlog(req, res) {
   const { id } = req.query;
+  if (!isObjectId(id)) return res.status(400).json({ message: 'Invalid blog ID' });
   const { value, error } = validateBlogInput(req.body);
   if (error) return res.status(400).json({ message: error });
 
   try {
     await dbConnect();
     const slug = await generateUniqueSlug(value.slug, id);
-    const blog = await Blog.findByIdAndUpdate(
-      id,
+    // $eq makes the id a plain value, never a query operator.
+    const blog = await Blog.findOneAndUpdate(
+      { _id: { $eq: id } },
       { title: value.title, slug, content: value.content, tags: value.tags },
       { new: true, runValidators: true }
     );
@@ -42,9 +44,10 @@ async function updateBlog(req, res) {
 
 async function deleteBlog(req, res) {
   const { id } = req.query;
+  if (!isObjectId(id)) return res.status(400).json({ message: 'Invalid blog ID' });
   try {
     await dbConnect();
-    const result = await Blog.deleteOne({ _id: id });
+    const result = await Blog.deleteOne({ _id: { $eq: id } });
     if (result.deletedCount === 0) return res.status(404).json({ message: 'Blog not found' });
 
     // Close the gap left in the ordering.

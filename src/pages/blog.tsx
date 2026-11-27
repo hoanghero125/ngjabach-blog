@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/Button';
 import { Calendar, Clock } from 'lucide-react';
 import { useFooterAnimation } from '@/context/FooterAnimationContext';
 import { useSearch } from '@/context/SearchContext';
+import { readingTime } from '@/lib/text';
+
+const PAGE_SIZE = 5;
 
 interface Blog {
   _id: string;
@@ -17,48 +20,47 @@ interface Blog {
   tags: string[];
 }
 
-const getReadingTime = (content: string): number => {
-  const words = content.trim().split(/\s+/).length;
-  return Math.max(1, Math.ceil(words / 200));
-};
-
 export default function BlogPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [displayedBlogs, setDisplayedBlogs] = useState<Blog[]>([]);
-  const [visibleCount, setVisibleCount] = useState<number>(5);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
   const { searchQuery } = useSearch();
   const { setTriggerFooterAnimation } = useFooterAnimation();
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const res = await axios.get('/api/blogs');
+    let cancelled = false;
+    axios
+      .get('/api/blogs')
+      .then((res) => {
+        if (cancelled) return;
         setBlogs(res.data);
-        setDisplayedBlogs(res.data.slice(0, 5));
-      } catch (err: any) {
-        setBlogs([]);
-        setDisplayedBlogs([]);
-      }
+        setStatus('ready');
+      })
+      .catch(() => !cancelled && setStatus('error'));
+    return () => {
+      cancelled = true;
     };
-    fetchBlogs();
   }, []);
 
   const filteredBlogs = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return blogs;
     return blogs.filter(
-      (blog: Blog) =>
-        blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (blog.tags && blog.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase())))
+      (blog) =>
+        blog.title.toLowerCase().includes(query) ||
+        (blog.tags || []).some((tag) => tag.toLowerCase().includes(query))
     );
   }, [blogs, searchQuery]);
 
+  // A new search starts again from the first page of results.
   useEffect(() => {
-    setDisplayedBlogs(filteredBlogs.slice(0, visibleCount));
-  }, [filteredBlogs, visibleCount]);
+    setVisibleCount(PAGE_SIZE);
+  }, [searchQuery]);
+
+  const displayedBlogs = filteredBlogs.slice(0, visibleCount);
 
   const handleLoadMore = () => {
-    const newVisibleCount = visibleCount + 5;
-    setVisibleCount(newVisibleCount);
-    setDisplayedBlogs(filteredBlogs.slice(0, newVisibleCount));
+    setVisibleCount((count) => count + PAGE_SIZE);
     setTriggerFooterAnimation(true);
   };
 
@@ -80,10 +82,23 @@ export default function BlogPage() {
             </p>
           </div>
           <section className={`w-full ${filteredBlogs.length <= visibleCount ? 'mb-12' : ''}`}>
-            {filteredBlogs.length === 0 ? (
+            {status === 'loading' ? (
+              <div className="space-y-4" aria-busy="true" aria-label="Loading posts">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="bg-white rounded-xl shadow-sm px-6 py-7 animate-pulse">
+                    <div className="h-8 bg-gray-100 rounded w-2/3" />
+                    <div className="h-4 bg-gray-100 rounded w-1/3 mt-4" />
+                  </div>
+                ))}
+              </div>
+            ) : status === 'error' ? (
+              <div className="flex justify-center items-center h-[50vh]">
+                <p className="text-2xl text-black font-semibold">Couldn&apos;t load posts right now. Please refresh in a moment.</p>
+              </div>
+            ) : filteredBlogs.length === 0 ? (
               <div className="flex justify-center items-center h-[50vh]">
                 <p className="text-2xl text-black font-semibold">
-                  Oops! Looks like your search broke the internet... or maybe we just don't have that post yet! 😅
+                  Oops! Looks like your search broke the internet... or maybe we just don&apos;t have that post yet! 😅
                 </p>
               </div>
             ) : (
@@ -103,7 +118,7 @@ export default function BlogPage() {
                         <span>·</span>
                         <div className="flex items-center gap-1">
                           <Clock className="h-3.5 w-3.5" />
-                          <span>{getReadingTime(displayedBlogs[0].content)} min read</span>
+                          <span>{readingTime(displayedBlogs[0].content)} min read</span>
                         </div>
                         {displayedBlogs[0].tags && displayedBlogs[0].tags.length > 0 && (
                           <>
@@ -138,7 +153,7 @@ export default function BlogPage() {
                               <span>·</span>
                               <div className="flex items-center gap-1">
                                 <Clock className="h-3.5 w-3.5" />
-                                <span>{getReadingTime(blog.content)} min read</span>
+                                <span>{readingTime(blog.content)} min read</span>
                               </div>
                               {blog.tags && blog.tags.length > 0 && (
                                 <>

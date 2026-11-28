@@ -167,7 +167,7 @@ export default function CreatePost() {
 
   return (
     <div className="bg-bg p-4">
-      <div className="max-w-[1325px] mx-auto">
+      <div className="mx-auto w-full max-w-[1200px] px-2 pt-4">
         <div className="flex justify-between items-center mb-4">
           <Link
             href="/admin"
@@ -296,7 +296,7 @@ export default function CreatePost() {
                   <input type="file" accept=".md,text/markdown" onChange={handleFileUpload} className="hidden" />
                 </label>
               </div>
-              <div data-color-mode={theme}>
+              <div className="editor-theme" data-color-mode={theme}>
                 <MDEditor
                   value={blog.content}
                   onChange={(value) => setBlog((b) => ({ ...b, content: value || '' }))}

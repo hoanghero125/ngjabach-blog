@@ -251,8 +251,8 @@ export default function Admin() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="bg-bg flex flex-col">
-        <div className="container mx-auto px-4 pt-4 pb-8 flex-grow">
-          <div className="max-w-[1325px] mx-auto">
+        <div className="mx-auto w-full max-w-[1200px] px-6 pt-8 pb-12 flex-grow">
+          <div>
             <div className="flex justify-between items-center mb-6 gap-4 flex-wrap">
               <h1 className="soft font-display text-[38px] font-semibold text-ink">Admin Panel</h1>
               <Link

@@ -118,3 +118,19 @@ body {
 [data-theme='light'] .motes {
   display: none;
 }
+
+/* Markdown editor (admin): use the site's colours instead of GitHub's. */
+.editor-theme.editor-theme .wmde-markdown-var,
+.editor-theme.editor-theme .wmde-markdown,
+.editor-theme.editor-theme .w-md-editor {
+  --color-canvas-default: var(--surface);
+  --color-canvas-subtle: var(--surface-2);
+  --color-fg-default: var(--ink);
+  --color-fg-muted: var(--muted);
+  --color-border-default: var(--line);
+  --color-border-muted: var(--line);
+  --color-neutral-muted: var(--chip);
+  --color-accent-fg: var(--accent-ink);
+  --md-editor-background-color: var(--surface);
+  --md-editor-box-shadow-color: var(--line);
+}

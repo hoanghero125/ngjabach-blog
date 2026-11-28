@@ -66,7 +66,7 @@ export default function CV() {
       <Motes />
       <SidebarLayout
         sidebar={
-          <ProfileSidebar showLinks={false}>
+          <ProfileSidebar showLinks={false} onCvPage>
             <p className="m-0 text-sm text-muted">
               <a href={`mailto:${profile.email}`} className="text-ink hover:text-accent-ink">
                 {profile.email}

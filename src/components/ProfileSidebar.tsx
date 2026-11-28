@@ -9,9 +9,11 @@ interface Props {
   children?: ReactNode;
   /** Show the social links (Home); other pages show a section list instead. */
   showLinks?: boolean;
+  /** On the CV page itself, only offer the PDF download (if any). */
+  onCvPage?: boolean;
 }
 
-export default function ProfileSidebar({ children, showLinks = true }: Props) {
+export default function ProfileSidebar({ children, showLinks = true, onCvPage = false }: Props) {
   return (
     <aside aria-label="Profile" className="flex flex-col gap-4 lg:sticky lg:top-6 lg:self-start">
       <div className="flex items-center gap-4 lg:flex-col lg:items-start">
@@ -60,7 +62,7 @@ export default function ProfileSidebar({ children, showLinks = true }: Props) {
         >
           <Download className="h-4 w-4" /> Download CV
         </a>
-      ) : (
+      ) : onCvPage ? null : (
         <Link
           href="/cv"
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-accent px-5 text-[15px] font-bold text-on-accent transition-opacity hover:opacity-90"

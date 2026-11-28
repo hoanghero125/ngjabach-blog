@@ -6,12 +6,16 @@ import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ArrowUp, ArrowDown, Edit, Trash, Plus, Calendar, Search, Tag } from 'lucide-react';
 import { useRequireAuth } from '@/context/AuthContext';
+import AdminNav from '@/components/admin/AdminNav';
 
 interface Blog {
   _id: string;
   title: string;
   content: string;
+  slug: string;
   createdAt: string;
+  publishedAt?: string;
+  published?: boolean;
   tags?: string[];
   order: number;
 }
@@ -85,12 +89,19 @@ const DraggableBlog = ({
       } ${isDragging ? 'opacity-50' : ''}`}
     >
       <div className="flex-1">
-        <h3 className="text-lg font-semibold text-ink">{blog.title}</h3>
+        <h3 className="flex flex-wrap items-center gap-2 text-lg font-semibold text-ink">
+          <Link href={`/post/${blog.slug}`} target="_blank" className="hover:text-accent-ink hover:underline" title="Open (drafts open as a private preview)">
+            {blog.title}
+          </Link>
+          {blog.published === false && (
+            <span className="rounded-full border border-accent/60 bg-accent/10 px-2 py-0.5 text-xs font-bold text-accent-ink">Draft</span>
+          )}
+        </h3>
         <div className="flex items-center gap-6 mt-1 flex-wrap">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted" />
             <p className="text-sm text-muted">
-              {new Date(blog.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+              {new Date(blog.publishedAt || blog.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -165,7 +176,8 @@ export default function Admin() {
 
   const fetchBlogs = useCallback(async () => {
     try {
-      const res = await axios.get('/api/blogs');
+      // all=1: include drafts (admin only)
+      const res = await axios.get('/api/blogs?all=1');
       updateBlogs(res.data);
       setError(null);
     } catch (err) {
@@ -253,8 +265,10 @@ export default function Admin() {
       <div className="bg-bg flex flex-col">
         <div className="mx-auto w-full max-w-[1200px] px-6 pt-8 pb-12 flex-grow">
           <div>
+            <h1 className="soft mb-4 font-display text-[34px] font-semibold text-ink">Admin</h1>
+            <AdminNav />
             <div className="flex justify-between items-center mb-6 gap-4 flex-wrap">
-              <h1 className="soft font-display text-[38px] font-semibold text-ink">Admin Panel</h1>
+              <p className="text-sm text-muted">Drag or use the arrows to set the order on the blog. Drafts are visible only to you.</p>
               <Link
                 href="/admin/create-post"
                 className="flex items-center gap-2 px-4 py-2 bg-accent text-on-accent rounded-lg hover:opacity-90 transition"

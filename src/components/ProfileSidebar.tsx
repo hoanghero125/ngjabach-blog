@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { Download } from 'lucide-react';
-import { profile } from '@/data/profile';
+import { useSite } from '@/context/SiteContext';
 import { LinkIcon } from '@/components/Icons';
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
 }
 
 export default function ProfileSidebar({ children, showLinks = true, onCvPage = false }: Props) {
+  const { profile } = useSite();
   return (
     <aside aria-label="Profile" className="flex flex-col gap-4 lg:sticky lg:top-6 lg:self-start">
       <div className="flex items-center gap-4 lg:flex-col lg:items-start">

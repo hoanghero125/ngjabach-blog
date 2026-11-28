@@ -1,6 +1,7 @@
-import { profile } from '@/data/profile';
+import { useSite } from '@/context/SiteContext';
 
 export default function Footer() {
+  const { profile } = useSite();
   return (
     <footer className="border-t border-line px-6 py-5 text-center text-[13px] text-faint">
       © {new Date().getFullYear()} {profile.name} · Designed &amp; developed by{' '}

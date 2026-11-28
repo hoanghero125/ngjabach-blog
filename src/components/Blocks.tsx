@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ReactNode } from 'react';
-import type { Publication } from '@/data/profile';
-import { profile } from '@/data/profile';
+import type { Publication } from '@/lib/site/schema';
+import { useSite } from '@/context/SiteContext';
 import { findCategory } from '@/lib/categories';
 
 /** Page container: sidebar + content on wide screens, stacked on phones. */
@@ -104,6 +104,7 @@ const pill =
   'inline-flex min-h-8 items-center rounded-full border border-line px-3 text-[13px] font-semibold text-ink transition-colors hover:border-accent hover:text-accent-ink';
 
 export function PublicationCard({ pub }: { pub: Publication }) {
+  const { profile } = useSite();
   return (
     <article className="flex flex-col gap-1.5 rounded-[20px] border border-line bg-surface p-4">
       <h3 className="m-0 text-[17px] font-bold leading-snug">{pub.title}</h3>

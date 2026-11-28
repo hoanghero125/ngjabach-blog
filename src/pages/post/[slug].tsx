@@ -6,7 +6,7 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { Copy } from 'lucide-react';
 import { CategoryTag, formatDate } from '@/components/Blocks';
-import { profile } from '@/data/profile';
+import { useSite } from '@/context/SiteContext';
 import { findCategory } from '@/lib/categories';
 import { markdownComponents, rehypePlugins, remarkPlugins } from '@/lib/markdown';
 import { excerpt, readingTime, stripComments } from '@/lib/text';
@@ -17,6 +17,8 @@ interface Blog {
   slug: string;
   content: string;
   createdAt: string;
+  publishedAt?: string;
+  published?: boolean;
   category?: string;
   tags?: string[];
 }
@@ -28,6 +30,7 @@ interface TocItem {
 }
 
 export default function BlogPost() {
+  const { profile } = useSite();
   const router = useRouter();
   const { slug } = router.query;
   const [blog, setBlog] = useState<Blog | null>(null);
@@ -131,6 +134,11 @@ export default function BlogPost() {
           </Head>
 
           <article className="min-w-0 max-w-[720px] flex-1">
+            {blog.published === false && (
+              <p role="status" className="mb-5 rounded-xl border border-accent/50 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent-ink">
+                Draft preview — only you can see this post until it is published.
+              </p>
+            )}
             <nav aria-label="Breadcrumb" className="mb-3.5 text-sm text-faint">
               <Link href="/blog" className="font-semibold text-accent-ink hover:underline">
                 Blog
@@ -144,7 +152,7 @@ export default function BlogPost() {
             </nav>
             <h1 className="soft m-0 font-display text-[34px] font-semibold leading-tight md:text-[40px]">{blog.title}</h1>
             <div className="mt-3.5 flex flex-wrap items-center gap-2.5 text-sm text-faint">
-              <span>{formatDate(blog.createdAt, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+              <span>{formatDate(blog.publishedAt || blog.createdAt, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
               <span aria-hidden="true">·</span>
               <span>{readingTime(blog.content)} min read</span>
               {category && (

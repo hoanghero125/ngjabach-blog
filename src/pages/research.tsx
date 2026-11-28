@@ -1,9 +1,12 @@
 import Head from 'next/head';
 import ProfileSidebar from '@/components/ProfileSidebar';
 import { Motes, PageTitle, PublicationCard, SectionHeading, SidebarLayout } from '@/components/Blocks';
-import { ongoingWork, profile, publications } from '@/data/profile';
+import type { GetStaticProps } from 'next';
+import { useSite } from '@/context/SiteContext';
+import { loadSiteForPage } from '@/lib/site/load';
 
 export default function Research() {
+  const { profile, publications, ongoingWork } = useSite();
   const published = publications.filter((p) => !p.status);
   const pending = publications.filter((p) => p.status);
   const years = [...new Set(published.map((p) => p.year))].sort((a, b) => b - a);
@@ -91,3 +94,10 @@ export default function Research() {
     </>
   );
 }
+
+// Rendered on the server from Admin → Site content; refreshed right after
+// every admin save, and at least every 5 minutes.
+export const getStaticProps: GetStaticProps = async () => ({
+  props: { site: await loadSiteForPage() },
+  revalidate: 300,
+});

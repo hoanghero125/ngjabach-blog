@@ -1,13 +1,21 @@
 const dbConnect = require('../../../lib/db');
 const Blog = require('../../../lib/models/Blog');
-const { requireAuth } = require('../../../lib/auth');
+const { requireAuth, getSessionUser } = require('../../../lib/auth');
 const { validateBlogInput } = require('../../../lib/validate');
 const { generateUniqueSlug } = require('../../../lib/blogs');
 
+// GET /api/blogs          -> published posts (public)
+// GET /api/blogs?all=1    -> every post including drafts (admin only)
 async function listBlogs(req, res) {
   try {
     await dbConnect();
-    const blogs = await Blog.find().sort({ order: -1 });
+    let filter = { published: { $ne: false } };
+    if (req.query.all === '1') {
+      const user = await getSessionUser(req);
+      if (!user) return res.status(401).json({ message: 'Not authenticated' });
+      filter = {};
+    }
+    const blogs = await Blog.find(filter).sort({ order: -1 });
     return res.status(200).json(blogs);
   } catch (err) {
     console.error('List blogs error:', err);
@@ -23,7 +31,12 @@ async function createBlog(req, res) {
     await dbConnect();
     const slug = await generateUniqueSlug(value.slug);
     const top = await Blog.findOne().sort({ order: -1 }).select('order');
-    const blog = await Blog.create({ ...value, slug, order: top ? top.order + 1 : 0 });
+    const blog = await Blog.create({
+      ...value,
+      slug,
+      order: top ? top.order + 1 : 0,
+      publishedAt: value.published ? new Date() : undefined,
+    });
     return res.status(201).json(blog);
   } catch (err) {
     if (err?.code === 11000) {

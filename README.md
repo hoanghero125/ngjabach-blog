@@ -86,7 +86,11 @@ npm start        # serve the production build
 
 ## Editing Content and Theme
 
-- **Your info** (bio, news, publications, CV, projects, links): `src/data/profile.ts`. Any empty list hides its section.
+- **Your info** (profile, news, publications, CV, projects, links): edit it in **Admin → Site content**. It is stored in MongoDB, so it survives every code update. Any empty list hides its section.
+  - The forms and the server-side checks are both generated from `src/lib/site/schema.ts`. To add a field, add it there.
+  - `src/lib/site/defaults.ts` is the built-in fallback. It is shown for sections never saved in the admin, or if the database is unreachable.
+- **Images and PDFs**: **Admin → Media** (or "Insert image / file" in the post editor). Files are stored in MongoDB, max 4 MB each; big photos are shrunk in the browser first.
+- **Drafts**: new posts start as drafts. Only the logged-in admin can see or preview them until you press Publish.
 - **Blog categories:** `src/lib/categories.ts` (keep the slugs in sync with `src/lib/validate.js`).
 - **Colours:** the dark (default) and light themes are CSS variables at the top of `src/styles/globals.css`. Use the token classes (`bg-bg`, `text-ink`, `border-line`, `bg-accent`, …) instead of raw colours so both themes stay in sync.
 - **Photo:** `public/img/ngjabach.jpg`.

@@ -3,11 +3,13 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
-import { ArrowLeft, Save, Plus, X, Upload } from 'lucide-react';
+import { ArrowLeft, Save, Plus, X, Upload, ImagePlus } from 'lucide-react';
 import slugify from 'slugify';
 import { useRequireAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { CATEGORIES } from '@/lib/categories';
+import MediaPicker from '@/components/admin/MediaPicker';
+import type { MediaItem } from '@/lib/media-client';
 import type { MarkdownPreviewProps } from '@uiw/react-markdown-preview';
 import { markdownComponents, rehypePlugins, remarkPlugins } from '@/lib/markdown';
 
@@ -32,12 +34,14 @@ interface Blog {
   content: string;
   tags: string[];
   category: string;
+  published: boolean;
 }
 
 export default function CreatePost() {
   const { status, handleUnauthorized } = useRequireAuth();
   const { theme } = useTheme();
-  const [blog, setBlog] = useState<Blog>({ title: '', slug: '', content: '', tags: [], category: '' });
+  const [blog, setBlog] = useState<Blog>({ title: '', slug: '', content: '', tags: [], category: '', published: false });
+  const [picking, setPicking] = useState(false);
   // New posts follow the title until the slug is edited by hand. Existing posts
   // never change slug on their own, because that would break links to them.
   const [slugLocked, setSlugLocked] = useState(false);
@@ -67,6 +71,7 @@ export default function CreatePost() {
           content: fetched.content || '',
           tags: fetched.tags || [],
           category: fetched.category || '',
+          published: fetched.published !== false,
         });
         setSlugLocked(true);
       } catch {
@@ -127,13 +132,29 @@ export default function CreatePost() {
     reader.readAsText(file);
   };
 
-  const handleSave = async () => {
+  // Puts an uploaded image (or a link to a PDF) where the cursor is in the editor.
+  const insertMedia = (item: MediaItem) => {
+    setPicking(false);
+    const snippet = item.contentType.startsWith('image/')
+      ? `![${item.filename.replace(/\.[^.]+$/, '')}](${item.url})`
+      : `[${item.filename}](${item.url})`;
+    const textarea = document.querySelector<HTMLTextAreaElement>('.w-md-editor-text-input');
+    setBlog((b) => {
+      // The textarea remembers its cursor position even after losing focus.
+      const at = textarea ? Math.min(textarea.selectionStart, b.content.length) : b.content.length;
+      const before = b.content.slice(0, at);
+      const sep = before && !before.endsWith('\n') ? '\n\n' : '';
+      return { ...b, content: `${before}${sep}${snippet}\n${b.content.slice(at)}` };
+    });
+  };
+
+  const handleSave = async (publish: boolean) => {
     const slug = blog.slug.replace(/^-+|-+$/g, '');
     if (!blog.title.trim()) return setError('Please enter a title.');
     if (!slug) return setError('Please enter a URL slug.');
     if (!blog.content.trim()) return setError('Please write some content.');
 
-    const payload = { title: blog.title, slug, content: blog.content, tags: blog.tags, category: blog.category };
+    const payload = { title: blog.title, slug, content: blog.content, tags: blog.tags, category: blog.category, published: publish };
     setSaving(true);
     setError(null);
     try {
@@ -178,15 +199,28 @@ export default function CreatePost() {
             </div>
             <span className="text-ink">Back to Admin Panel</span>
           </Link>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 bg-accent text-on-accent font-bold rounded-lg hover:opacity-90 transition disabled:opacity-60"
-          >
-            <Save className="h-4 w-4" />
-            {saving ? 'Saving…' : 'Save Post'}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${blog.published ? 'bg-cat-notes/20 text-ink' : 'border border-accent/60 bg-accent/10 text-accent-ink'}`}>
+              {blog.published ? 'Published' : 'Draft'}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleSave(false)}
+              disabled={saving}
+              className="flex items-center gap-2 rounded-lg border border-line bg-surface px-4 py-2 font-semibold text-ink transition hover:bg-chip disabled:opacity-60"
+            >
+              {blog.published ? 'Unpublish (make draft)' : 'Save draft'}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSave(true)}
+              disabled={saving}
+              className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-bold text-on-accent transition hover:opacity-90 disabled:opacity-60"
+            >
+              <Save className="h-4 w-4" />
+              {saving ? 'Saving…' : blog.published ? 'Update' : 'Publish'}
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -290,11 +324,17 @@ export default function CreatePost() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="block text-xl font-medium text-ink">Content (Markdown)</span>
-                <label className="flex items-center gap-2 p-2 border border-line rounded-lg cursor-pointer hover:bg-chip text-ink">
-                  <Upload className="h-4 w-4" />
-                  Upload .md
-                  <input type="file" accept=".md,text/markdown" onChange={handleFileUpload} className="hidden" />
-                </label>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" onClick={() => setPicking(true)} className="flex items-center gap-2 p-2 border border-line rounded-lg hover:bg-chip text-ink">
+                    <ImagePlus className="h-4 w-4" />
+                    Insert image / file
+                  </button>
+                  <label className="flex items-center gap-2 p-2 border border-line rounded-lg cursor-pointer hover:bg-chip text-ink">
+                    <Upload className="h-4 w-4" />
+                    Upload .md
+                    <input type="file" accept=".md,text/markdown" onChange={handleFileUpload} className="hidden" />
+                  </label>
+                </div>
               </div>
               <div className="editor-theme" data-color-mode={theme}>
                 <MDEditor
@@ -306,6 +346,7 @@ export default function CreatePost() {
                   previewOptions={markdownPreviewOptions}
                 />
               </div>
+              {picking && <MediaPicker accept="any" onClose={() => setPicking(false)} onSelect={insertMedia} />}
             </div>
           </div>
         </div>

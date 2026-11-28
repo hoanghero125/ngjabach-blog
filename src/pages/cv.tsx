@@ -1,10 +1,10 @@
 import Head from 'next/head';
 import ProfileSidebar from '@/components/ProfileSidebar';
 import { Motes, PageTitle, SectionHeading, SidebarLayout } from '@/components/Blocks';
-import {
-  awards, education, profile, publications, researchExperience, service, skills, workExperience,
-  type TimelineEntry,
-} from '@/data/profile';
+import type { GetStaticProps } from 'next';
+import { useSite } from '@/context/SiteContext';
+import { loadSiteForPage } from '@/lib/site/load';
+import type { RowEntry, TimelineEntry } from '@/lib/site/schema';
 
 function Entries({ items }: { items: TimelineEntry[] }) {
   return (
@@ -32,13 +32,14 @@ function Entries({ items }: { items: TimelineEntry[] }) {
   );
 }
 
-function Rows({ items }: { items: { title: string; detail: string; year: string }[] }) {
+function Rows({ items }: { items: RowEntry[] }) {
   return (
     <ul>
       {items.map((item) => (
         <li key={item.title + item.year} className="grid grid-cols-[minmax(0,1fr)_auto] gap-6 border-b border-dashed border-line py-3 text-[15px] last:border-b-0">
           <span>
-            <strong>{item.title}</strong>, {item.detail}
+            <strong>{item.title}</strong>
+            {item.detail && <>, {item.detail}</>}
           </span>
           <span className="font-semibold text-accent-ink">{item.year}</span>
         </li>
@@ -48,6 +49,7 @@ function Rows({ items }: { items: { title: string; detail: string; year: string 
 }
 
 export default function CV() {
+  const { profile, publications, education, researchExperience, workExperience, awards, service, skills } = useSite();
   const sections = [
     { id: 'education', label: 'Education', show: education.length > 0 },
     { id: 'research', label: 'Research experience', show: researchExperience.length > 0 },
@@ -163,3 +165,10 @@ export default function CV() {
     </>
   );
 }
+
+// Rendered on the server from Admin → Site content; refreshed right after
+// every admin save, and at least every 5 minutes.
+export const getStaticProps: GetStaticProps = async () => ({
+  props: { site: await loadSiteForPage() },
+  revalidate: 300,
+});

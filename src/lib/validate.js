@@ -22,7 +22,7 @@ const isSlug = (value) => typeof value === 'string' && SLUG_RE.test(value);
 // Returns { value } on success or { error } with a message for the client.
 function validateBlogInput(body) {
   if (!body || typeof body !== 'object') return { error: 'Invalid request body' };
-  const { title, slug, content, tags = [], category = '' } = body;
+  const { title, slug, content, tags = [], category = '', published = true } = body;
 
   if (typeof title !== 'string' || !title.trim()) return { error: 'Title is required' };
   if (title.trim().length > LIMITS.title) return { error: `Title must be at most ${LIMITS.title} characters` };
@@ -41,12 +41,14 @@ function validateBlogInput(body) {
     return { error: 'Unknown category' };
   }
 
+  if (typeof published !== 'boolean') return { error: 'published must be true or false' };
+
   const cleanTags = [...new Set(tags.map((t) => t.trim()).filter(Boolean))];
   if (cleanTags.length > LIMITS.tags) return { error: `At most ${LIMITS.tags} tags are allowed` };
   if (cleanTags.some((t) => t.length > LIMITS.tag)) return { error: `Each tag must be at most ${LIMITS.tag} characters` };
 
   return {
-    value: { title: title.trim(), slug: slug.trim(), content, tags: cleanTags, category },
+    value: { title: title.trim(), slug: slug.trim(), content, tags: cleanTags, category, published },
   };
 }
 

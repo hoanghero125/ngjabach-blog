@@ -2,11 +2,15 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Motes, PageTitle } from '@/components/Blocks';
-import { profile, projects, type Project } from '@/data/profile';
+import type { GetStaticProps } from 'next';
+import { useSite } from '@/context/SiteContext';
+import { loadSiteForPage } from '@/lib/site/load';
+import type { Project } from '@/lib/site/schema';
 
 const FILTERS: ('All' | Project['category'])[] = ['All', 'Research', 'Tools & apps'];
 
 export default function Projects() {
+  const { profile, projects } = useSite();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>('All');
   const shown = filter === 'All' ? projects : projects.filter((p) => p.category === filter);
 
@@ -72,3 +76,10 @@ export default function Projects() {
     </>
   );
 }
+
+// Rendered on the server from Admin → Site content; refreshed right after
+// every admin save, and at least every 5 minutes.
+export const getStaticProps: GetStaticProps = async () => ({
+  props: { site: await loadSiteForPage() },
+  revalidate: 300,
+});

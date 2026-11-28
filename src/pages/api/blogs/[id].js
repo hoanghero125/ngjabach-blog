@@ -26,11 +26,19 @@ async function updateBlog(req, res) {
     await dbConnect();
     const slug = await generateUniqueSlug(value.slug, id);
     // $eq makes the id a plain value, never a query operator.
-    const blog = await Blog.findOneAndUpdate(
-      { _id: { $eq: id } },
-      { title: value.title, slug, content: value.content, tags: value.tags, category: value.category },
-      { new: true, runValidators: true }
-    );
+    const existing = await Blog.findOne({ _id: { $eq: id } }).select('publishedAt');
+    if (!existing) return res.status(404).json({ message: 'Blog not found' });
+    const update = {
+      title: value.title,
+      slug,
+      content: value.content,
+      tags: value.tags,
+      category: value.category,
+      published: value.published,
+    };
+    // First time this post goes public: stamp its publication date.
+    if (value.published && !existing.publishedAt) update.publishedAt = new Date();
+    const blog = await Blog.findOneAndUpdate({ _id: { $eq: id } }, update, { new: true, runValidators: true });
     if (!blog) return res.status(404).json({ message: 'Blog not found' });
     return res.status(200).json(blog);
   } catch (err) {
@@ -60,6 +68,8 @@ async function deleteBlog(req, res) {
   }
 }
 
+// Reading a single post by id is only used by the editor (and would expose drafts).
+const protectedGet = requireAuth((req, res) => getBlog(req, res, req.query.id));
 const protectedUpdate = requireAuth(updateBlog);
 const protectedDelete = requireAuth(deleteBlog);
 
@@ -70,7 +80,7 @@ export default function handler(req, res) {
   }
   switch (req.method) {
     case 'GET':
-      return getBlog(req, res, id);
+      return protectedGet(req, res);
     case 'PUT':
       return protectedUpdate(req, res);
     case 'DELETE':

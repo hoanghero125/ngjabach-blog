@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { SiteProvider } from '@/context/SiteContext';
 import '@/styles/globals.css';
 import 'katex/dist/katex.min.css';
 import '@uiw/react-markdown-preview/markdown.css';
@@ -13,6 +14,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider>
       <AuthProvider>
+        <SiteProvider initial={pageProps.site}>
         <Head>
           <title>Nguyễn Gia Bách</title>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,6 +26,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           </main>
           <Footer />
         </div>
+        </SiteProvider>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -9,6 +9,7 @@ interface ApiBlog {
   title: string;
   content: string;
   createdAt: string;
+  publishedAt?: string;
   category?: string;
   tags?: string[];
 }
@@ -31,7 +32,7 @@ export function usePosts() {
             _id: b._id,
             slug: b.slug,
             title: b.title,
-            createdAt: b.createdAt,
+            createdAt: b.publishedAt || b.createdAt,
             category: b.category,
             tags: b.tags || [],
             summary: excerpt(b.content),

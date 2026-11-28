@@ -2,11 +2,12 @@ import Head from 'next/head';
 import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { Motes, PageTitle, PostRow } from '@/components/Blocks';
-import { profile } from '@/data/profile';
+import { useSite } from '@/context/SiteContext';
 import { CATEGORIES } from '@/lib/categories';
 import { usePosts } from '@/lib/usePosts';
 
 export default function BlogPage() {
+  const { profile } = useSite();
   const { posts, status } = usePosts();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>('all');

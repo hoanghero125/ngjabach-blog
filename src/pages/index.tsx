@@ -2,10 +2,13 @@ import Head from 'next/head';
 import Link from 'next/link';
 import ProfileSidebar from '@/components/ProfileSidebar';
 import { Motes, PageTitle, PostRow, PublicationCard, SectionHeading, SidebarLayout, TextLink } from '@/components/Blocks';
-import { news, profile, publications } from '@/data/profile';
+import type { GetStaticProps } from 'next';
+import { useSite } from '@/context/SiteContext';
+import { loadSiteForPage } from '@/lib/site/load';
 import { usePosts } from '@/lib/usePosts';
 
 export default function Home() {
+  const { profile, news, publications } = useSite();
   const { posts, status } = usePosts();
   const selected = publications.filter((p) => p.selected);
 
@@ -95,3 +98,10 @@ export default function Home() {
     </>
   );
 }
+
+// Rendered on the server from Admin → Site content; refreshed right after
+// every admin save, and at least every 5 minutes.
+export const getStaticProps: GetStaticProps = async () => ({
+  props: { site: await loadSiteForPage() },
+  revalidate: 300,
+});

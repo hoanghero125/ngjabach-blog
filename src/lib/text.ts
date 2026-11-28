@@ -21,6 +21,25 @@ export const stripComments = (content: string): string => {
   return out;
 };
 
+// A one-line plain-text summary: the first real paragraph of the post.
+export const excerpt = (content: string, max = 160): string => {
+  const lines = stripComments(content)
+    .replace(/```[\s\S]*?```/g, '')
+    .split('\n')
+    .map((l) => l.trim());
+  const first =
+    lines.find(
+      (l) => l && !/^(#|\||>|---|\*\*\*|!\[|<|\$\$|[-*+] |\d+\. )/.test(l)
+    ) || '';
+  const text = first
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/[*_`~]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+};
+
 // Words per minute, ignoring comments, fenced code blocks and link targets.
 export const readingTime = (content: string): number => {
   const text = stripComments(content)

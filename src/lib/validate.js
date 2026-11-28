@@ -2,6 +2,9 @@
 // it may be a string, a number, an array or a MongoDB operator object such as
 // {"$ne": null}. Only plain strings of sane length pass.
 
+// Keep in sync with src/lib/categories.ts.
+const CATEGORY_SLUGS = ['paper-explainer', 'ml-notes', 'paper-reading', 'journey'];
+
 const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{0,198}[a-z0-9])?$/;
 const OBJECT_ID_RE = /^[a-f0-9]{24}$/i;
 
@@ -19,7 +22,7 @@ const isSlug = (value) => typeof value === 'string' && SLUG_RE.test(value);
 // Returns { value } on success or { error } with a message for the client.
 function validateBlogInput(body) {
   if (!body || typeof body !== 'object') return { error: 'Invalid request body' };
-  const { title, slug, content, tags = [] } = body;
+  const { title, slug, content, tags = [], category = '' } = body;
 
   if (typeof title !== 'string' || !title.trim()) return { error: 'Title is required' };
   if (title.trim().length > LIMITS.title) return { error: `Title must be at most ${LIMITS.title} characters` };
@@ -34,13 +37,17 @@ function validateBlogInput(body) {
   if (!Array.isArray(tags) || tags.some((t) => typeof t !== 'string')) {
     return { error: 'Tags must be a list of text values' };
   }
+  if (typeof category !== 'string' || (category && !CATEGORY_SLUGS.includes(category))) {
+    return { error: 'Unknown category' };
+  }
+
   const cleanTags = [...new Set(tags.map((t) => t.trim()).filter(Boolean))];
   if (cleanTags.length > LIMITS.tags) return { error: `At most ${LIMITS.tags} tags are allowed` };
   if (cleanTags.some((t) => t.length > LIMITS.tag)) return { error: `Each tag must be at most ${LIMITS.tag} characters` };
 
   return {
-    value: { title: title.trim(), slug: slug.trim(), content, tags: cleanTags },
+    value: { title: title.trim(), slug: slug.trim(), content, tags: cleanTags, category },
   };
 }
 
-module.exports = { isObjectId, isSlug, validateBlogInput };
+module.exports = { CATEGORY_SLUGS, isObjectId, isSlug, validateBlogInput };

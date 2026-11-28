@@ -35,30 +35,30 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-130px)] flex items-center justify-center px-4 bg-[#FAF9F6]">
+    <div className="min-h-[calc(100vh-130px)] flex items-center justify-center px-4 bg-bg">
       <div className="w-full max-w-sm">
-        <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-500 mb-4">Admin</p>
-        <div className="bg-white rounded-xl shadow-sm p-8">
+        <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent-ink mb-4">Admin</p>
+        <div className="bg-surface rounded-xl shadow-sm p-8">
           {error && (
-            <div role="alert" className="mb-5 px-4 py-3 rounded-lg bg-red-50 border border-red-100 text-sm text-red-500">
+            <div role="alert" className="mb-5 px-4 py-3 rounded-lg border border-danger/40 bg-danger/10 text-sm text-danger">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
-              <label htmlFor="username" className="block text-xs font-bold uppercase tracking-[0.15em] text-gray-400 mb-2">
+              <label htmlFor="username" className="block text-xs font-bold uppercase tracking-[0.15em] text-faint mb-2">
                 Username
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-faint" />
                 <input
                   type="text"
                   id="username"
                   autoComplete="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-line bg-surface-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
                   required
                   maxLength={100}
                 />
@@ -66,18 +66,18 @@ export default function Login() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-bold uppercase tracking-[0.15em] text-gray-400 mb-2">
+              <label htmlFor="password" className="block text-xs font-bold uppercase tracking-[0.15em] text-faint mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-faint" />
                 <input
                   type="password"
                   id="password"
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-line bg-surface-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition"
                   required
                   maxLength={200}
                 />
@@ -87,7 +87,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-2.5 text-white text-sm font-semibold rounded-lg transition-colors mt-1 bg-[#0a1128] hover:bg-[#1f2c47] disabled:opacity-60"
+              className="w-full py-2.5 text-sm font-semibold rounded-lg transition-colors mt-1 bg-accent text-on-accent hover:opacity-90 disabled:opacity-60"
             >
               {submitting ? 'Signing in…' : 'Sign in'}
             </button>

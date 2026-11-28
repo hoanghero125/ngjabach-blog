@@ -1,17 +1,120 @@
 @import url('./custom.css');
 @import 'tailwindcss';
 
-@keyframes fadeOutDown {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
+/*
+ * Theme tokens. Dark is the default; light is opt-in via the toggle
+ * (data-theme="light" on <html>, remembered in localStorage).
+ * Every colour on the site comes from these variables, so both themes
+ * always change together. Use the Tailwind names below (bg-bg, text-ink,
+ * border-line, bg-accent, ...) instead of raw colours.
+ */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #14100b;
+  --surface: #1c1610;
+  --surface-2: #241c14;
+  --line: #3a2e20;
+  --ink: #f3e9d2;
+  --muted: #c9b99a;
+  --faint: #a8977a;
+  --accent: #e2b44c;
+  --accent-ink: #e2b44c;
+  --on-accent: #14100b;
+  --nav: #0e0b07;
+  --nav-active: rgba(226, 180, 76, 0.16);
+  --chip: #2a2118;
+  --callout: #221a10;
+  --code-bg: #0e0b07;
+  --code-inline: #f0b8c8;
+  --danger: #ff9b9b;
+  --glow: 0 0 36px rgba(226, 180, 76, 0.28);
+  --cat-paper: #b9a6e8;
+  --cat-notes: #9fd3b8;
+  --cat-reading: #8fb8e0;
+  --cat-life: #e9a3a3;
+  --hl-keyword: #c9a6f5;
+  --hl-string: #9fd3b8;
+  --hl-number: #e2b44c;
+  --hl-comment: #8c7b62;
+  --hl-title: #8fb8e0;
+  --hl-attr: #f0b8c8;
+  --hl-meta: #a8977a;
 }
 
-.fade-out-down {
-  animation: fadeOutDown 0.5s ease-in-out forwards;
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #faf6ee;
+  --surface: #fffdf8;
+  --surface-2: #f3ecdd;
+  --line: #e8dcc4;
+  --ink: #2b2118;
+  --muted: #5a4a3a;
+  --faint: #6f604f;
+  --accent: #c9a24a;
+  --accent-ink: #7a5a12;
+  --on-accent: #2b2118;
+  --nav: #fffdf8;
+  --nav-active: #f3e7cc;
+  --chip: #f3e7cc;
+  --callout: #f7efd9;
+  --code-bg: #f7f1e4;
+  --code-inline: #a23e62;
+  --danger: #b42318;
+  --glow: 0 12px 28px rgba(43, 33, 24, 0.12);
+  --cat-paper: #7b66c9;
+  --cat-notes: #4f9e78;
+  --cat-reading: #4c86bf;
+  --cat-life: #c76b6b;
+  --hl-keyword: #8a4b9e;
+  --hl-string: #3f7a5c;
+  --hl-number: #7a5a12;
+  --hl-comment: #8a7a66;
+  --hl-title: #2f6aa3;
+  --hl-attr: #a23e62;
+  --hl-meta: #6f604f;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-on-accent: var(--on-accent);
+  --color-nav: var(--nav);
+  --color-nav-active: var(--nav-active);
+  --color-chip: var(--chip);
+  --color-callout: var(--callout);
+  --color-code-bg: var(--code-bg);
+  --color-code-inline: var(--code-inline);
+  --color-danger: var(--danger);
+  --color-cat-paper: var(--cat-paper);
+  --color-cat-notes: var(--cat-notes);
+  --color-cat-reading: var(--cat-reading);
+  --color-cat-life: var(--cat-life);
+  --shadow-glow: var(--glow);
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-logo: 'Idealy', 'Fraunces', serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* Fraunces "soft" axis: rounder, friendlier display headings. */
+.soft {
+  font-variation-settings: 'SOFT' 100;
+}
+
+/* Gold light motes: decoration for the dark theme only. */
+[data-theme='light'] .motes {
+  display: none;
 }

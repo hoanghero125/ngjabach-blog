@@ -6,6 +6,8 @@ import dynamic from 'next/dynamic';
 import { ArrowLeft, Save, Plus, X, Upload } from 'lucide-react';
 import slugify from 'slugify';
 import { useRequireAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+import { CATEGORIES } from '@/lib/categories';
 import type { MarkdownPreviewProps } from '@uiw/react-markdown-preview';
 import { markdownComponents, rehypePlugins, remarkPlugins } from '@/lib/markdown';
 
@@ -29,11 +31,13 @@ interface Blog {
   slug: string;
   content: string;
   tags: string[];
+  category: string;
 }
 
 export default function CreatePost() {
   const { status, handleUnauthorized } = useRequireAuth();
-  const [blog, setBlog] = useState<Blog>({ title: '', slug: '', content: '', tags: [] });
+  const { theme } = useTheme();
+  const [blog, setBlog] = useState<Blog>({ title: '', slug: '', content: '', tags: [], category: '' });
   // New posts follow the title until the slug is edited by hand. Existing posts
   // never change slug on their own, because that would break links to them.
   const [slugLocked, setSlugLocked] = useState(false);
@@ -62,6 +66,7 @@ export default function CreatePost() {
           slug: fetched.slug || toSlug(fetched.title || 'untitled-post'),
           content: fetched.content || '',
           tags: fetched.tags || [],
+          category: fetched.category || '',
         });
         setSlugLocked(true);
       } catch {
@@ -128,7 +133,7 @@ export default function CreatePost() {
     if (!slug) return setError('Please enter a URL slug.');
     if (!blog.content.trim()) return setError('Please write some content.');
 
-    const payload = { title: blog.title, slug, content: blog.content, tags: blog.tags };
+    const payload = { title: blog.title, slug, content: blog.content, tags: blog.tags, category: blog.category };
     setSaving(true);
     setError(null);
     try {
@@ -154,30 +159,30 @@ export default function CreatePost() {
   if (invalidId) {
     return (
       <div className="container mx-auto p-4">
-        This edit link is not valid. <Link href="/admin" className="text-blue-500 hover:underline">Back to Admin Panel</Link>
+        This edit link is not valid. <Link href="/admin" className="text-accent-ink hover:underline">Back to Admin Panel</Link>
       </div>
     );
   }
   if (loading) return <div className="container mx-auto p-4">Loading...</div>;
 
   return (
-    <div className="bg-[#FAF9F6] p-4">
+    <div className="bg-bg p-4">
       <div className="max-w-[1325px] mx-auto">
         <div className="flex justify-between items-center mb-4">
           <Link
             href="/admin"
-            className="group inline-flex items-center gap-2 p-2 rounded-md bg-[#FAF9F6] hover:bg-white hover:shadow-sm transition-all"
+            className="group inline-flex items-center gap-2 p-2 rounded-md bg-bg hover:bg-surface hover:shadow-sm transition-all"
           >
-            <div className="w-8 h-8 flex items-center justify-center bg-white rounded-md group-hover:bg-[#FAF9F6]">
-              <ArrowLeft className="h-4 w-4 text-blue-500" />
+            <div className="w-8 h-8 flex items-center justify-center bg-surface rounded-md group-hover:bg-bg">
+              <ArrowLeft className="h-4 w-4 text-accent-ink" />
             </div>
-            <span className="text-black">Back to Admin Panel</span>
+            <span className="text-ink">Back to Admin Panel</span>
           </Link>
           <button
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 bg-black text-white font-bold rounded-lg hover:bg-gray-800 transition disabled:opacity-60"
+            className="flex items-center gap-2 px-4 py-2 bg-accent text-on-accent font-bold rounded-lg hover:opacity-90 transition disabled:opacity-60"
           >
             <Save className="h-4 w-4" />
             {saving ? 'Saving…' : 'Save Post'}
@@ -185,15 +190,15 @@ export default function CreatePost() {
         </div>
 
         {error && (
-          <div role="alert" className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+          <div role="alert" className="mb-4 p-3 border border-danger/40 bg-danger/10 text-danger rounded-lg">
             {error}
           </div>
         )}
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-surface p-6 rounded-xl shadow-sm border border-line">
           <div className="flex flex-col gap-4">
             <div>
-              <label htmlFor="post-title" className="block text-xl font-medium text-black mb-1">Post Title</label>
+              <label htmlFor="post-title" className="block text-xl font-medium text-ink mb-1">Post Title</label>
               <input
                 id="post-title"
                 type="text"
@@ -201,30 +206,45 @@ export default function CreatePost() {
                 value={blog.title}
                 maxLength={300}
                 onChange={(e) => handleTitleChange(e.target.value)}
-                className="w-full p-3 border rounded-lg text-base border-gray-300 text-black"
+                className="w-full p-3 border rounded-lg text-base border-line bg-surface text-ink"
               />
             </div>
 
             <div>
-              <label htmlFor="post-slug" className="block text-xl font-medium text-black mb-1">URL</label>
-              <div className="flex items-center rounded-lg border border-gray-300 overflow-hidden">
-                <span className="px-3 py-3 bg-gray-50 text-gray-500 text-base border-r border-gray-300 whitespace-nowrap">/post/</span>
+              <label htmlFor="post-slug" className="block text-xl font-medium text-ink mb-1">URL</label>
+              <div className="flex items-center rounded-lg border border-line overflow-hidden">
+                <span className="px-3 py-3 bg-surface-2 text-muted text-base border-r border-line whitespace-nowrap">/post/</span>
                 <input
                   id="post-slug"
                   type="text"
                   value={blog.slug}
                   maxLength={200}
                   onChange={(e) => handleSlugChange(e.target.value)}
-                  className="w-full p-3 text-base text-black focus:outline-none"
+                  className="w-full p-3 text-base bg-surface text-ink focus:outline-none"
                 />
               </div>
               {id && (
-                <p className="mt-1 text-sm text-gray-500">Changing the URL of a published post breaks links that point to it.</p>
+                <p className="mt-1 text-sm text-muted">Changing the URL of a published post breaks links that point to it.</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="post-tag" className="block text-xl font-medium text-black mb-1">Tags</label>
+              <label htmlFor="post-category" className="block text-xl font-medium text-ink mb-1">Category</label>
+              <select
+                id="post-category"
+                value={blog.category}
+                onChange={(e) => setBlog((b) => ({ ...b, category: e.target.value }))}
+                className="w-full p-3 border rounded-lg text-base border-line bg-surface text-ink"
+              >
+                <option value="">No category</option>
+                {CATEGORIES.map((c) => (
+                  <option key={c.slug} value={c.slug}>{c.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="post-tag" className="block text-xl font-medium text-ink mb-1">Tags</label>
               <div className="flex items-center gap-2">
                 <input
                   id="post-tag"
@@ -239,26 +259,26 @@ export default function CreatePost() {
                       handleAddTag();
                     }
                   }}
-                  className="w-full p-3 border rounded-lg text-base border-gray-300 text-black"
+                  className="w-full p-3 border rounded-lg text-base border-line bg-surface text-ink"
                 />
                 <button
                   type="button"
                   aria-label="Add tag"
                   onClick={handleAddTag}
-                  className="flex items-center gap-2 px-3 py-3 bg-black text-white font-bold rounded-lg hover:bg-gray-800 transition"
+                  className="flex items-center gap-2 px-3 py-3 bg-accent text-on-accent font-bold rounded-lg hover:opacity-90 transition"
                 >
                   <Plus className="h-6 w-6" />
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {blog.tags.map((tag) => (
-                  <div key={tag} className="flex items-center gap-1 bg-gray-200 text-black text-base px-2 py-2 rounded-full">
+                  <div key={tag} className="flex items-center gap-1 bg-chip text-ink text-base px-2 py-2 rounded-full">
                     <span className="leading-none relative top-[-1.5px]">{tag}</span>
                     <button
                       type="button"
                       aria-label={`Remove tag ${tag}`}
                       onClick={() => handleRemoveTag(tag)}
-                      className="flex items-center justify-center text-red-500 hover:text-red-600"
+                      className="flex items-center justify-center text-danger hover:opacity-80"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -269,20 +289,20 @@ export default function CreatePost() {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="block text-xl font-medium text-black">Content (Markdown)</span>
-                <label className="flex items-center gap-2 p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 text-black">
+                <span className="block text-xl font-medium text-ink">Content (Markdown)</span>
+                <label className="flex items-center gap-2 p-2 border border-line rounded-lg cursor-pointer hover:bg-chip text-ink">
                   <Upload className="h-4 w-4" />
                   Upload .md
                   <input type="file" accept=".md,text/markdown" onChange={handleFileUpload} className="hidden" />
                 </label>
               </div>
-              <div data-color-mode="light">
+              <div data-color-mode={theme}>
                 <MDEditor
                   value={blog.content}
                   onChange={(value) => setBlog((b) => ({ ...b, content: value || '' }))}
                   preview="live"
                   height={650}
-                  className="border border-gray-300 rounded-lg"
+                  className="border border-line rounded-lg"
                   previewOptions={markdownPreviewOptions}
                 />
               </div>

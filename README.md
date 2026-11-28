@@ -84,6 +84,13 @@ npm run build    # production build, the same one Vercel runs
 npm start        # serve the production build
 ```
 
+## Editing Content and Theme
+
+- **Your info** (bio, news, publications, CV, projects, links): `src/data/profile.ts`. Any empty list hides its section.
+- **Blog categories:** `src/lib/categories.ts` (keep the slugs in sync with `src/lib/validate.js`).
+- **Colours:** the dark (default) and light themes are CSS variables at the top of `src/styles/globals.css`. Use the token classes (`bg-bg`, `text-ink`, `border-line`, `bg-accent`, …) instead of raw colours so both themes stay in sync.
+- **Photo:** `public/img/ngjabach.jpg`.
+
 ## Making Changes
 
 1. `git switch main && git pull`

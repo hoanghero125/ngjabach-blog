@@ -28,7 +28,7 @@ async function updateBlog(req, res) {
     // $eq makes the id a plain value, never a query operator.
     const blog = await Blog.findOneAndUpdate(
       { _id: { $eq: id } },
-      { title: value.title, slug, content: value.content, tags: value.tags },
+      { title: value.title, slug, content: value.content, tags: value.tags, category: value.category },
       { new: true, runValidators: true }
     );
     if (!blog) return res.status(404).json({ message: 'Blog not found' });

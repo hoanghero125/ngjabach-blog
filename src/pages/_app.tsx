@@ -2,32 +2,29 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { FooterAnimationProvider } from '@/context/FooterAnimationContext';
 import { AuthProvider } from '@/context/AuthContext';
-import { SearchProvider } from '@/context/SearchContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import '@/styles/globals.css';
 import 'katex/dist/katex.min.css';
-import 'highlight.js/styles/github.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <AuthProvider>
-      <FooterAnimationProvider>
-        <SearchProvider>
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-grow flex flex-col bg-[#FAF9F6]">
-                <Head>
-                  <title>NgJaBach Blog</title>
-                </Head>
-              <Component {...pageProps} />
-            </main>
-            <Footer />
-          </div>
-        </SearchProvider>
-      </FooterAnimationProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Head>
+          <title>Nguyễn Gia Bách</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
+        <div className="flex min-h-screen flex-col bg-bg text-ink">
+          <Navbar />
+          <main className="relative flex flex-grow flex-col">
+            <Component {...pageProps} />
+          </main>
+          <Footer />
+        </div>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

@@ -3,15 +3,13 @@
   src: url('/fonts/Idealy.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-}
-
-.font-idealy {
-  font-family: 'Idealy', sans-serif;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'DekHandwriting';
   src: url('/fonts/DekHandwriting-Regular.ttf') format('truetype');
+  font-display: swap;
 }
 
 .dek-font {
@@ -24,11 +22,11 @@
 
 .dek-hover-effects:hover {
   color: #ed571b;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 4px #ed571b;
+  text-shadow: 0 0 6px rgba(237, 87, 27, 0.6);
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 /* KaTeX — prevent Tailwind table reset from breaking matrix/cases environments */
@@ -49,3 +47,15 @@ body {
   overflow-y: hidden;
   padding: 0.5rem 0;
 }
+
+/* Code highlighting (highlight.js classes) using the theme tokens. */
+.hljs { color: var(--ink); background: transparent; }
+.hljs-keyword, .hljs-selector-tag, .hljs-built_in, .hljs-type, .hljs-literal { color: var(--hl-keyword); }
+.hljs-string, .hljs-regexp, .hljs-addition, .hljs-symbol { color: var(--hl-string); }
+.hljs-number, .hljs-bullet, .hljs-variable, .hljs-template-variable { color: var(--hl-number); }
+.hljs-comment, .hljs-quote, .hljs-deletion { color: var(--hl-comment); font-style: italic; }
+.hljs-title, .hljs-section, .hljs-name, .hljs-function .hljs-title { color: var(--hl-title); }
+.hljs-attr, .hljs-attribute, .hljs-params, .hljs-property { color: var(--hl-attr); }
+.hljs-meta, .hljs-doctag, .hljs-tag { color: var(--hl-meta); }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }

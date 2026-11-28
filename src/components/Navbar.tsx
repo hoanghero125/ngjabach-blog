@@ -1,116 +1,119 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Search, LogOut, Menu, X } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { useSearch } from '@/context/SearchContext';
 import { useEffect, useState } from 'react';
+import { LogOut, Menu, Moon, Sun, X } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+
+const LINKS = [
+  { href: '/', label: 'Home' },
+  { href: '/research', label: 'Research' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/cv', label: 'CV' },
+];
+
+const isActive = (pathname: string, href: string) =>
+  href === '/' ? pathname === '/' : pathname === href || (href === '/blog' && pathname.startsWith('/post'));
 
 export default function Navbar() {
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
-  const { searchQuery, setSearchQuery } = useSearch();
-  const [isAdminPage, setIsAdminPage] = useState(false);
-  const [isBlogPage, setIsBlogPage] = useState(false);
-  const [isHomePage, setIsHomePage] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    setIsAdminPage(router.pathname.startsWith('/admin'));
-    setIsBlogPage(router.pathname === '/blog');
-    setIsHomePage(router.pathname === '/');
-  }, [router.pathname]);
+  const isAdminPage = router.pathname.startsWith('/admin');
 
   useEffect(() => {
     setMobileOpen(false);
   }, [router.pathname]);
 
-  const desktopRight = isAdminPage && isAuthenticated ? (
+  const themeButton = (
     <button
-      onClick={logout}
-      className="flex items-center space-x-2 px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
+      type="button"
+      onClick={toggleTheme}
+      aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-accent-ink transition-colors hover:bg-chip"
     >
-      <LogOut className="h-5 w-5" />
-      <span>Sign Out</span>
+      {theme === 'dark' ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
     </button>
-  ) : isBlogPage ? (
-    <div className="relative">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="pl-10 pr-4 py-2 rounded-xl bg-[#0a1128] border border-[#1a263f] text-gray-400 text-base focus:outline-none focus:ring-1 focus:ring-gray-300"
-      />
-    </div>
-  ) : isHomePage ? (
-    <Link href="/blog" className="flex items-center space-x-2 px-4 py-2 rounded-md bg-[#1f2c47] text-white hover:bg-[#293955] transition-colors">
-      <span>Blog</span>
-    </Link>
-  ) : null;
+  );
+
+  const linkClass = (active: boolean) =>
+    `rounded-full px-3.5 py-2.5 text-[15px] transition-colors ${
+      active ? 'bg-nav-active font-bold text-ink' : 'font-medium text-muted hover:text-ink'
+    }`;
 
   return (
-    <nav className="bg-[#0a1128] text-white py-3.5 px-4">
-      <div className="max-w-[1325px] mx-auto flex justify-between items-center h-11">
-        <Link href="/" className="text-3xl font-idealy relative top-[2px]">
+    <header className="relative z-10 border-b border-line bg-nav">
+      <nav aria-label="Main" className="mx-auto flex max-w-[1200px] items-center justify-between gap-2 px-6 py-2.5">
+        <Link href="/" className="font-logo text-[30px] leading-none text-accent-ink">
           NgJaBach
         </Link>
 
-        {/* Desktop */}
-        <div className="hidden sm:flex items-center space-x-6">
-          {desktopRight}
+        <div className="hidden items-center gap-0.5 md:flex">
+          {LINKS.map(({ href, label }) => {
+            const active = isActive(router.pathname, href);
+            return (
+              <Link key={href} href={href} aria-current={active ? 'page' : undefined} className={linkClass(active)}>
+                {label}
+              </Link>
+            );
+          })}
           {isAuthenticated && !isAdminPage && (
-            <Link href="/admin" className="text-l font-normal text-gray-300 hover:text-white">
+            <Link href="/admin" className={linkClass(false)}>
               Admin
             </Link>
           )}
+          {isAuthenticated && isAdminPage && (
+            <button
+              type="button"
+              onClick={logout}
+              className="ml-1 inline-flex items-center gap-2 rounded-full px-3.5 py-2.5 text-[15px] font-semibold text-danger hover:bg-chip"
+            >
+              <LogOut className="h-4 w-4" /> Sign out
+            </button>
+          )}
+          <span className="ml-1.5">{themeButton}</span>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="sm:hidden p-2 rounded-md hover:bg-[#1f2c47] transition-colors"
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
+        <div className="flex items-center gap-2 md:hidden">
+          {themeButton}
+          <button
+            type="button"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-chip"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </nav>
 
-      {/* Mobile dropdown */}
       {mobileOpen && (
-        <div className="sm:hidden max-w-[1325px] mx-auto mt-3 pb-3 space-y-2 border-t border-[#1a263f] pt-3">
-          {isBlogPage && (
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#0a1128] border border-[#1a263f] text-gray-400 text-base focus:outline-none focus:ring-1 focus:ring-gray-300"
-              />
-            </div>
-          )}
-          {isAdminPage && isAuthenticated ? (
-            <button
-              onClick={logout}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
-            >
-              <LogOut className="h-5 w-5" />
-              <span>Sign Out</span>
-            </button>
-          ) : isHomePage ? (
-            <Link href="/blog" className="block px-4 py-2 rounded-md bg-[#1f2c47] text-white hover:bg-[#293955] transition-colors text-center">
-              Blog
-            </Link>
-          ) : null}
-          {isAuthenticated && !isAdminPage && (
-            <Link href="/admin" className="block px-1 py-1 text-gray-300 hover:text-white text-sm">
-              Admin
-            </Link>
-          )}
+        <div className="border-t border-line px-6 pb-4 pt-2 md:hidden">
+          <div className="mx-auto flex max-w-[1200px] flex-col gap-1">
+            {LINKS.map(({ href, label }) => {
+              const active = isActive(router.pathname, href);
+              return (
+                <Link key={href} href={href} aria-current={active ? 'page' : undefined} className={linkClass(active)}>
+                  {label}
+                </Link>
+              );
+            })}
+            {isAuthenticated && !isAdminPage && (
+              <Link href="/admin" className={linkClass(false)}>
+                Admin
+              </Link>
+            )}
+            {isAuthenticated && isAdminPage && (
+              <button type="button" onClick={logout} className="rounded-full px-3.5 py-2.5 text-left text-[15px] font-semibold text-danger">
+                Sign out
+              </button>
+            )}
+          </div>
         </div>
       )}
-    </nav>
+    </header>
   );
 }
